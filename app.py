@@ -1,7 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, send_file
 import pandas as pd
 import os
 from datetime import datetime
+from openpyxl import Workbook
+from io import BytesIO
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -80,6 +82,46 @@ def allocate_students_to_classrooms(students, classrooms, selected_subjects):
 
     return allocation
 
+def create_seating_plan_excel(seating_plan_data):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Seating Plan"
+
+    headers = ["Classroom", "Subject", "Number of Students", "Roll Number Range"]
+    ws.append(headers)
+
+    for entry in seating_plan_data:
+        ws.append([entry['classroom'], entry['subject'], entry['num_students'], entry['roll_range']])
+
+    return wb
+
+def create_roll_call_excel(classroom_data):
+    wb = Workbook()
+    
+    for classroom, data in classroom_data.items():
+        ws = wb.create_sheet(title=f"Classroom {classroom}")
+        
+        # Add header information
+        ws.append(["Somaiya Vidyavihar University"])
+        ws.append(["K.J. Somaiya College Of Engineering"])
+        ws.append([f"Block No: {classroom}"])
+        ws.append([f"Course: {data['subject_name']} ({data['subject_code']})"])
+        ws.append([f"Programme: {data['programme']}", f"Semester: {data['semester']}"])
+        ws.append([])  # Empty row
+
+        # Add table headers
+        headers = ["SRNO", "SEAT No.", "NAME", "CANDIDATE SIGNATURE"]
+        ws.append(headers)
+
+        # Add student data
+        for idx, student in enumerate(data['students'], start=1):
+            ws.append([idx, student['Student Roll'], student['Name'], ""])
+
+    # Remove the default sheet created by openpyxl
+    wb.remove(wb['Sheet'])
+
+    return wb
+
 @app.route('/', methods=['GET'])
 def index():
     return render_template('index.html', subjects=subjects)
@@ -127,6 +169,34 @@ def seating_plan():
 
     return render_template('seating_plan.html', seating_plan=seating_plan_data)
 
+@app.route('/download_seating_plan')
+def download_seating_plan():
+    if 'file_uploaded' not in session or 'selected_subjects' not in session:
+        return redirect(url_for('index'))
+
+    selected_subjects = session['selected_subjects']
+    allocation = allocate_students_to_classrooms(students_df, classrooms, selected_subjects)
+
+    seating_plan_data = []
+    for classroom, data in allocation.items():
+        students = data['students']
+        roll_numbers = students['Student Roll'].tolist()
+        seating_plan_data.append({
+            'classroom': classroom,
+            'subject': data['subject'],
+            'num_students': len(students),
+            'roll_range': f"{min(roll_numbers)} - {max(roll_numbers)}"
+        })
+
+    wb = create_seating_plan_excel(seating_plan_data)
+    
+    # Save to BytesIO object
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    return send_file(output, download_name='seating_plan.xlsx', as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
 @app.route('/roll_call_list')
 def roll_call_list():
     if 'file_uploaded' not in session or 'selected_subjects' not in session:
@@ -156,6 +226,35 @@ def roll_call_list():
                            exam_date=exam_date,
                            exam_time=exam_time,
                            exam_session=exam_session)
+
+@app.route('/download_roll_call_list')
+def download_roll_call_list():
+    if 'file_uploaded' not in session or 'selected_subjects' not in session:
+        return redirect(url_for('index'))
+    
+    selected_subjects = session['selected_subjects']
+    allocation = allocate_students_to_classrooms(students_df, classrooms, selected_subjects)
+
+    classroom_data = {}
+    for classroom, data in allocation.items():
+        subject_code = data['subject']
+        subject_info = next(subject for subject in subjects if subject['course_code'] == subject_code)
+        classroom_data[classroom] = {
+            'subject_name': subject_info['name'],
+            'subject_code': subject_code,
+            'programme': 'T.Y. B.Tech Computer Engineering',  # You may need to adjust this
+            'semester': subject_info['semester'],
+            'students': data['students'].to_dict(orient='records')
+        }
+
+    wb = create_roll_call_excel(classroom_data)
+    
+    # Save to BytesIO object
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    return send_file(output, download_name='roll_call_list.xlsx', as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 if __name__ == '__main__':
     app.run(debug=True)
