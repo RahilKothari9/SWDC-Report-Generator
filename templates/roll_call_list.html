@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roll Call List</title>
+</head>
+<body>
+  <h1>Roll Call List</h1>
+  <table border="1">
+    <tr>
+      <th>Year</th>
+      <th>Programme</th>
+      <th>Semester</th>
+      <th>Student Roll</th>
+      <th>Name</th>
+      <th>Course Codes</th>
+    </tr>
+    {% for student in students %}
+      <tr>
+        <td>{{ student['Year'] }}</td>
+        <td>{{ student['Programme'] }}</td>
+        <td>{{ student['Semester'] }}</td>
+        <td>{{ student['Student Roll'] }}</td>
+        <td>{{ student['Name'] }}</td>
+        <td>
+          {% for i in range(1, 11) %}
+            {% if student['Course Code ' ~ i] %}
+              {{ student['Course Code ' ~ i] }}<br>
+            {% endif %}
+          {% endfor %}
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+  <a href="/">Back to Home</a>
+</body>
+</html>
