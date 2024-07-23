@@ -10,15 +10,21 @@
   <table border="1">
     <tr>
       <th>Classroom</th>
+      <th>Subject</th>
+      <th>Number of Students</th>
       <th>Roll Number Range</th>
     </tr>
     {% for entry in seating_plan %}
       <tr>
         <td>{{ entry.classroom }}</td>
+        <td>{{ entry.subject }}</td>
+        <td>{{ entry.num_students }}</td>
         <td>{{ entry.roll_range }}</td>
       </tr>
     {% endfor %}
   </table>
+  <a href="/download_seating_plan">Download Seating Plan Excel</a>
+  <br>
   <a href="/">Back to Home</a>
 </body>
 </html>

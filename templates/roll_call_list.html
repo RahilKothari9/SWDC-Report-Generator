@@ -7,32 +7,59 @@
 </head>
 <body>
   <h1>Roll Call List</h1>
-  <table border="1">
-    <tr>
-      <th>Year</th>
-      <th>Programme</th>
-      <th>Semester</th>
-      <th>Student Roll</th>
-      <th>Name</th>
-      <th>Course Codes</th>
-    </tr>
-    {% for student in students %}
+  {% for classroom, data in classroom_data.items() %}
+  <div class="header">
+    <h2>Somaiya Vidyavihar University</h2>
+    <h3>K.J. Somaiya College Of Engineering</h3>
+  </div>
+  <div class="subheader">
+    <p><strong>ATTENDANCE OF CANDIDATES WHO ARE PRESENT FOR THE EXAMINATION {{ exam_date }}</strong></p>
+    <p><strong>College Code: 16</strong></p>
+  </div>
+  <div class="subheader">
+    <p><strong>Instructions:</strong> Junior Supervisors should personally obtain the signature of the candidate, while checking the Hall-Tickets/ Fee Receipt / Identity Card.</p>
+  </div>
+  <div class="subheader">
+    <p><strong>Supervisor's No.</strong></p>
+    <p><strong>Block No.</strong> {{ classroom }}</p>
+  </div>
+  <div class="subheader">
+    <p><strong>Programme:</strong> {{ data.programme }}</p>
+    <p><strong>Semester:</strong> {{ data.semester }}</p>
+  </div>
+  <div class="subheader">
+    <p><strong>Seat No From:</strong> {{ data.students[0]['Student Roll'] }}</p>
+    <p><strong>Seat No.Upto:</strong> {{ data.students[-1]['Student Roll'] }}</p>
+    <p><strong>Total:</strong> {{ data.students|length }}</p>
+  </div>
+  <div class="subheader">
+    <p><strong>Course (Paper) Name:</strong> {{ data.subject_name }}</p>
+    <p><strong>Time:</strong> {{ exam_time }}</p>
+  </div>
+  <div class="subheader">
+    <p><strong>Date:</strong> {{ exam_date }}</p>
+    <p><strong>Session:</strong> {{ exam_session }}</p>
+    <p><strong>Section:</strong></p>
+  </div>
+    <table border="1">
       <tr>
-        <td>{{ student['Year'] }}</td>
-        <td>{{ student['Programme'] }}</td>
-        <td>{{ student['Semester'] }}</td>
-        <td>{{ student['Student Roll'] }}</td>
-        <td>{{ student['Name'] }}</td>
-        <td>
-          {% for i in range(1, 11) %}
-            {% if student['Course Code ' ~ i] %}
-              {{ student['Course Code ' ~ i] }}<br>
-            {% endif %}
-          {% endfor %}
-        </td>
+        <th>SRNO</th>
+        <th>SEAT No.</th>
+        <th>NAME</th>
+        <th>CANDIDATE SIGNATURE</th>
       </tr>
-    {% endfor %}
-  </table>
+      {% for student in data.students %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>{{ student['Student Roll'] }}</td>
+          <td>{{ student['Name'] }}</td>
+          <td></td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% endfor %}
+  <a href="/download_roll_call_list">Download Roll Call List Excel</a>
+  <br>
   <a href="/">Back to Home</a>
 </body>
 </html>

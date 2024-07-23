@@ -7,10 +7,28 @@
 </head>
 <body>
   <h1>Classroom Management</h1>
+  <h2>Step 1: Upload Student Data</h2>
+  <form method="POST" action="/upload" enctype="multipart/form-data">
+    <label for="file">Choose Excel file:</label>
+    <input type="file" id="file" name="file" accept=".xlsx" required>
+    <input type="submit" value="Upload">
+  </form>
+
+  <h2>Step 2: Select Subjects</h2>
+  <form method="POST" action="/select_subjects">
+    <label for="subjects">Choose subjects:</label><br>
+    <select name="subjects" id="subjects" multiple required>
+      {% for subject in subjects %}
+        <option value="{{ subject.course_code }}">{{ subject.name }} ({{ subject.course_code }})</option>
+      {% endfor %}
+    </select><br><br>
+    <input type="submit" value="Save Selected Subjects">
+  </form>
+
+  <h2>Step 3: Generate Reports</h2>
   <ul>
     <li><a href="/seating_plan">Generate Seating Plan</a></li>
-    <li><a href="/roll_call_list">Roll Call List</a></li>
-    <li><a href="/upload">Upload Student Data</a></li>
+    <li><a href="/roll_call_list">Generate Roll Call List</a></li>
   </ul>
 </body>
 </html>
