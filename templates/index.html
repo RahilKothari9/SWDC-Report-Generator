@@ -1,34 +1,50 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Classroom Management</title>
+  <link rel="shortcut icon" href="https://lms-kjsce.somaiya.edu/pluginfile.php/1/theme_essential/favicon/1702638405/Somaiya%20Logo.png">
+  <meta content="Automatic seating generator for K.J. Somaiya College of Engineering" name="description" />
+  <link rel="stylesheet" href="./../static/styles.css">
 </head>
+
 <body>
-  <h1>Classroom Management</h1>
-  <h2>Step 1: Upload Student Data</h2>
-  <form method="POST" action="/upload" enctype="multipart/form-data">
-    <label for="file">Choose Excel file:</label>
-    <input type="file" id="file" name="file" accept=".xlsx" required>
-    <input type="submit" value="Upload">
-  </form>
+  <header>
+    <img class="logo" src="https://myaccount.somaiya.edu/img/somaiya-university-logo.svg" alt="logo" width="200px">
+  </header>
 
-  <h2>Step 2: Select Subjects</h2>
-  <form method="POST" action="/select_subjects">
-    <label for="subjects">Choose subjects:</label><br>
-    <select name="subjects" id="subjects" multiple required>
-      {% for subject in subjects %}
-        <option value="{{ subject.course_code }}">{{ subject.name }} ({{ subject.course_code }})</option>
-      {% endfor %}
-    </select><br><br>
-    <input type="submit" value="Save Selected Subjects">
-  </form>
+  <main>
+    <div class="container2">
+      <h1>Classroom Management</h1>
 
-  <h2>Step 3: Generate Reports</h2>
-  <ul>
-    <li><a href="/seating_plan">Generate Seating Plan</a></li>
-    <li><a href="/roll_call_list">Generate Roll Call List</a></li>
-  </ul>
+      <h2>Step 1: Upload Student Data</h2>
+      <form method="POST" action="/upload" enctype="multipart/form-data">
+        <input type="file" id="file" name="file" accept=".xlsx" required><br>
+        <input type="submit" value="Upload">
+      </form>
+      
+      <h2>Step 2: Select Subjects</h2>
+      <form method="POST" action="/select_subjects">
+        <select name="subjects" id="subjects" multiple required>
+          {% for subject in subjects %}
+            <option value="{{ subject.course_code }}">{{ subject.name }} ({{ subject.course_code }})</option>
+          {% endfor %}
+        </select>
+        <br>
+        <input type="submit" value="Save Selected Subjects">
+      </form>
+    
+      <h2>Step 3: Generate Reports</h2>
+      <ul>
+        <li><a href="/seating_plan">Generate Seating Plan</a></li>
+        <li><a href="/roll_call_list">Generate Roll Call List</a></li>
+      </ul>
+  
+    </div>
+  </main>
+
+  <footer>&copy; KJSCE 2024</footer>
 </body>
 </html>
