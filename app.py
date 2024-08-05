@@ -42,6 +42,7 @@ classrooms = {
     # Add or edit classrooms as needed
 }
 
+class_num = {}
 # Example subjects with specified course codes
 subjects = [
     {'name': 'Data Definition Language', 'course_code': 'DDL', 'semester': 1},
@@ -103,10 +104,10 @@ def create_seating_plan_excel(seating_plan_data):
     
     font1 = Font(name='Times New Roman', size=15, bold=True)
     font2 = Font(name='Times New Roman', size=12, bold=True)
+    font3 = Font(name='Times New Roman', size=11)
     alignment1 = Alignment(horizontal='center', vertical='center')
     border_style = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
         
-
     # Define the text and its formatting for B2
     title_text = "SOMAIYA VIDYAVIHAR UNIVERSITY"
     ws['B2'] = title_text
@@ -170,9 +171,57 @@ def create_seating_plan_excel(seating_plan_data):
     ws.merge_cells('J10:J11')
     ws.merge_cells('K10:K11')
 
-    #add data
-    # for entry in seating_plan_data:
-    #     ws.append([entry['classroom'], entry['subject'], entry['num_students'], entry['roll_range']])
+    # Start adding data from row 12
+    start_row = 12
+    prev_values = [None] * 4  # For Programme, Class, Sem, Course
+    merge_starts = [None] * 4
+    
+    for idx, entry in enumerate(seating_plan_data, start=1):
+        row = start_row + idx
+        current_values = [
+            "T.Y. B.Tech Computer Engineering",  # Programme
+            class_num[entry['subject']],  # Class
+            1,  # Semester (assumed to be 1)
+            entry['subject'],  # Course
+        ]
+        
+        # Check for changes in values and merge cells if needed
+        for i in range(4):
+            if current_values[i] != prev_values[i]:
+                if merge_starts[i] is not None and merge_starts[i] < row - 1:
+                    ws.merge_cells(start_row=merge_starts[i], start_column=i+2, 
+                                   end_row=row-1, end_column=i+2)
+                merge_starts[i] = row
+                cell = ws.cell(row=row, column=i+2, value=current_values[i])
+                cell.border = border_style
+                cell.font = font3
+                cell.alignment = alignment1
+            prev_values[i] = current_values[i]
+
+        # Add other values
+        ws.cell(row=row, column=6, value=entry['roll_range'].split(' - ')[0])
+        ws.cell(row=row, column=7, value=entry['roll_range'].split(' - ')[1])
+        ws.cell(row=row, column=8, value=entry['num_students'])
+        ws.cell(row=row, column=9, value=entry['classroom'])
+        ws.cell(row=row, column=10, value=entry['classroom'][1])  # Floor (second character)
+        ws.cell(row=row, column=11, value=entry['classroom'][0])  # Building (first character)
+
+        # Apply styling to the non-merged data cells
+        for col in range(6, 12):
+            cell = ws.cell(row=row, column=col)
+            cell.border = border_style
+            cell.font = font3
+            cell.alignment = alignment1
+
+    # Perform final merges for the last group of rows
+    for i in range(4):
+        if merge_starts[i] is not None and merge_starts[i] < row:
+            ws.merge_cells(start_row=merge_starts[i], start_column=i+2, 
+                           end_row=row, end_column=i+2)
+
+    # Adjust column widths
+    for col in range(2, 12):
+        ws.column_dimensions[get_column_letter(col)].width = 15
 
     return wb
 
@@ -435,6 +484,11 @@ def seating_plan():
             'num_students': len(students),
             'roll_range': f"{min(roll_numbers)} - {max(roll_numbers)}"
         })
+        if data['subject'] not in class_num:
+            class_num[data['subject']] = 1
+        else :
+            class_num[data['subject']] += 1
+    print(class_num)
 
     return render_template('seating_plan.html', seating_plan=seating_plan_data)
 
