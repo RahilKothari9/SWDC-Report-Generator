@@ -42,14 +42,26 @@ classrooms = {
     # Add or edit classrooms as needed
 }
 
-class_num = {}
+
 # Example subjects with specified course codes
 subjects = [
-    {'name': 'Data Definition Language', 'course_code': 'DDL', 'semester': 1},
-    {'name': 'Theory and Computation', 'course_code': 'TACD', 'semester': 1},
-    {'name': 'Relational Database Management System', 'course_code': 'RDBMS', 'semester': 1},
-    {'name': 'Programming Structures and Object Technology', 'course_code': 'PSOT', 'semester': 1},
-    {'name': 'MERN Stack', 'course_code': 'MERN', 'semester': 1},
+    {'name': 'Digital Design Laboratory', 'course_code': 'DDL', 'semester': 3},
+    {'name': 'Integral Transform and Vector Calculus', 'course_code': 'ITVC', 'semester': 3},
+    {'name': 'Object Oriented Programming Methodology', 'course_code': 'OOPM', 'semester': 3},
+    {'name': 'Computer Organisation and Architecture', 'course_code': 'COA', 'semester': 3},
+    {'name': 'Theory of Automata and Compiler Design', 'course_code': 'TACD', 'semester': 4},
+    {'name': 'Relational Database Management System', 'course_code': 'RDBMS', 'semester': 4},
+    {'name': 'Probability, Statistics and Optimization Techniques', 'course_code': 'PSOT', 'semester': 4},
+    {'name': 'Analysis of Algorithms', 'course_code': 'AOA', 'semester': 4},
+    {'name': 'MERN Stack', 'course_code': 'MERN', 'semester': 5},
+    {'name': 'Operating Systems', 'course_code': 'OS', 'semester': 5},
+    {'name': 'Computer Networks', 'course_code': 'CN', 'semester': 5},
+    {'name': 'Soft Computing', 'course_code': 'E-SC', 'semester': 5},
+    {'name': 'Computer Graphics', 'course_code': 'E-CG', 'semester': 5},
+    {'name': 'Database Management systems', 'course_code': 'DBMS', 'semester': 3},
+    {'name': 'Discrete and Applied Mathematics', 'course_code': 'DAM', 'semester': 3},
+    {'name': 'Data Communication and Networking', 'course_code': 'DCN', 'semester': 3},
+    {'name': 'Data Structures', 'course_code': 'DS', 'semester': 3},
 ]
 
 students_df = pd.DataFrame(columns=['Year', 'Programme', 'Semester', 'Student Roll', 'Name', 
@@ -104,10 +116,24 @@ def create_seating_plan_excel(seating_plan_data):
     
     font1 = Font(name='Times New Roman', size=15, bold=True)
     font2 = Font(name='Times New Roman', size=12, bold=True)
-    font3 = Font(name='Times New Roman', size=11)
-    alignment1 = Alignment(horizontal='center', vertical='center')
+    font3 = Font(name='Times New Roman', size=14)
+    font4 = Font(name='Times New Roman', size=28, bold=True)
+    alignment1 = Alignment(horizontal='center', vertical='center', wrap_text = True)
+    alignment2 = Alignment(horizontal='left', vertical='center')
     border_style = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
-        
+    
+    ws.column_dimensions['A'].width = 6
+    ws.column_dimensions['B'].width = 13
+    ws.column_dimensions['C'].width = 6
+    ws.column_dimensions['D'].width = 5
+    ws.column_dimensions['E'].width = 13
+    ws.column_dimensions['F'].width = 17
+    ws.column_dimensions['G'].width = 17
+    ws.column_dimensions['H'].width = 11
+    ws.column_dimensions['I'].width = 9
+    ws.column_dimensions['J'].width = 7
+    ws.column_dimensions['K'].width = 8
+    
     # Define the text and its formatting for B2
     title_text = "SOMAIYA VIDYAVIHAR UNIVERSITY"
     ws['B2'] = title_text
@@ -149,7 +175,7 @@ def create_seating_plan_excel(seating_plan_data):
     ws.row_dimensions[9].height = 30
 
     # Define the text and formatting for headers
-    headers = ["Programme", "Class", "Sem", "Course/Subject", "Exam seat No.", "","Total No. Of Students",
+    headers = ["Programme", "Class", "Sem", "Course/ Subject", "Exam seat No.", "","Total No. of Students",
                "Block No.", "Floor", "BLDG"]
     ws['F11'] = 'From'
     ws['G11'] = 'To'
@@ -170,21 +196,35 @@ def create_seating_plan_excel(seating_plan_data):
     ws.merge_cells('I10:I11')
     ws.merge_cells('J10:J11')
     ws.merge_cells('K10:K11')
+    ws.row_dimensions[11].height = 35
 
     # Start adding data from row 12
     start_row = 12
-    prev_values = [None] * 4  # For Programme, Class, Sem, Course
+    prev_values = [None] * 4  # For Programme, Class(Year), Sem, Course
     merge_starts = [None] * 4
+
+    floor_merge_start = None
+    building_merge_start = None
+    prev_floor = None
+    prev_building = None
+
+    building_names = {
+    'A': 'ARYABHATTA',
+    'B': 'BHASKARACHARYA'
+}
     
     for idx, entry in enumerate(seating_plan_data, start=1):
-        row = start_row + idx
+        row = start_row + idx - 1
         current_values = [
-            "T.Y. B.Tech Computer Engineering",  # Programme
-            class_num[entry['subject']],  # Class
-            1,  # Semester (assumed to be 1)
+            entry['programme'],  #Programme
+            entry['year'],  # Class(Year)
+            entry['semester'],# Semester
             entry['subject'],  # Course
         ]
         
+        #define row height
+        ws.row_dimensions[row].height = 40
+
         # Check for changes in values and merge cells if needed
         for i in range(4):
             if current_values[i] != prev_values[i]:
@@ -203,11 +243,35 @@ def create_seating_plan_excel(seating_plan_data):
         ws.cell(row=row, column=7, value=entry['roll_range'].split(' - ')[1])
         ws.cell(row=row, column=8, value=entry['num_students'])
         ws.cell(row=row, column=9, value=entry['classroom'])
-        ws.cell(row=row, column=10, value=entry['classroom'][1])  # Floor (second character)
-        ws.cell(row=row, column=11, value=entry['classroom'][0])  # Building (first character)
+        
+        # Floor merging
+        current_floor = entry['classroom'][1]   
+        if current_floor != prev_floor:
+            if floor_merge_start is not None:
+                ws.merge_cells(start_row=floor_merge_start, start_column=10, 
+                               end_row=row-1, end_column=10)
+            floor_merge_start = row
+            cell = ws.cell(row=row, column=10, value=current_floor)
+            cell.border = border_style
+            cell.font = font3
+            cell.alignment = alignment1
+        prev_floor = current_floor
+
+        # Building merging
+        current_building = building_names.get(entry['classroom'][0])
+        if current_building != prev_building:
+            if building_merge_start is not None:
+                ws.merge_cells(start_row=building_merge_start, start_column=11, 
+                               end_row=row-1, end_column=11)
+            building_merge_start = row
+            cell = ws.cell(row=row, column=11, value=current_building)
+            cell.border = border_style
+            cell.font = font4
+            cell.alignment = alignment1
+        prev_building = current_building
 
         # Apply styling to the non-merged data cells
-        for col in range(6, 12):
+        for col in range(6, 10):
             cell = ws.cell(row=row, column=col)
             cell.border = border_style
             cell.font = font3
@@ -219,9 +283,23 @@ def create_seating_plan_excel(seating_plan_data):
             ws.merge_cells(start_row=merge_starts[i], start_column=i+2, 
                            end_row=row, end_column=i+2)
 
-    # Adjust column widths
-    for col in range(2, 12):
-        ws.column_dimensions[get_column_letter(col)].width = 15
+    # Final merges for floor and building
+    if floor_merge_start is not None:
+        ws.merge_cells(start_row=floor_merge_start, start_column=10, 
+                       end_row=row, end_column=10)
+    if building_merge_start is not None:
+        ws.merge_cells(start_row=building_merge_start, start_column=11, 
+                       end_row=row, end_column=11)
+    
+    # Define the text and formatting for footer
+    footer_text = "Date: 04.12.2023" #make dynamic
+    ws[f'B{row+3}'] = footer_text
+    ws[f'B{row+3}'].font = font2
+    ws[f'B{row+3}'].alignment = alignment2
+    footer_text = "EIC"
+    ws[f'I{row+3}'] = footer_text
+    ws[f'I{row+3}'].font = font2
+    ws[f'I{row+3}'].alignment = alignment2
 
     return wb
 
@@ -484,11 +562,6 @@ def seating_plan():
             'num_students': len(students),
             'roll_range': f"{min(roll_numbers)} - {max(roll_numbers)}"
         })
-        if data['subject'] not in class_num:
-            class_num[data['subject']] = 1
-        else :
-            class_num[data['subject']] += 1
-    print(class_num)
 
     return render_template('seating_plan.html', seating_plan=seating_plan_data)
 
@@ -508,6 +581,9 @@ def download_seating_plan():
             'classroom': classroom,
             'subject': data['subject'],
             'num_students': len(students),
+            'programme': students['Programme'].iloc[0],
+            'year': students['Year'].iloc[0],
+            'semester' :students['Semester'].iloc[0],
             'roll_range': f"{min(roll_numbers)} - {max(roll_numbers)}"
         })
 
