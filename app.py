@@ -38,7 +38,7 @@ classrooms = {
     'B402': 30,
     'B403': 30,
     'B404': 30,
-    'B405': 30,
+    'A101': 30,
     # Add or edit classrooms as needed
 }
 
@@ -111,195 +111,230 @@ def allocate_students_to_classrooms(students, classrooms, selected_subjects):
 
 def create_seating_plan_excel(seating_plan_data):
     wb = Workbook()
-    ws = wb.active
-    ws.title = "Seating Plan"
+
+    building_data = {}
+    for entry in seating_plan_data:
+        building = entry['classroom'][0]
+        if building not in building_data:
+            building_data[building] = []
+        building_data[building].append(entry)
+
+    #separate sheets for separate buildings
+    for building, data in building_data.items():
+        ws = wb.create_sheet(title=f"{building}")
     
-    font1 = Font(name='Times New Roman', size=15, bold=True)
-    font2 = Font(name='Times New Roman', size=12, bold=True)
-    font3 = Font(name='Times New Roman', size=14)
-    font4 = Font(name='Times New Roman', size=28, bold=True)
-    alignment1 = Alignment(horizontal='center', vertical='center', wrap_text = True)
-    alignment2 = Alignment(horizontal='left', vertical='center')
-    border_style = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
-    
-    ws.column_dimensions['A'].width = 6
-    ws.column_dimensions['B'].width = 13
-    ws.column_dimensions['C'].width = 6
-    ws.column_dimensions['D'].width = 5
-    ws.column_dimensions['E'].width = 13
-    ws.column_dimensions['F'].width = 17
-    ws.column_dimensions['G'].width = 17
-    ws.column_dimensions['H'].width = 11
-    ws.column_dimensions['I'].width = 9
-    ws.column_dimensions['J'].width = 7
-    ws.column_dimensions['K'].width = 8
-    
-    # Define the text and its formatting for B2
-    title_text = "SOMAIYA VIDYAVIHAR UNIVERSITY"
-    ws['B2'] = title_text
-    ws['B2'].font = font1
-    ws['B2'].alignment = alignment1
-    ws.merge_cells('B2:K2')
-    ws.row_dimensions[2].height = 20
+        font1 = Font(name='Times New Roman', size=15, bold=True)
+        font2 = Font(name='Times New Roman', size=12, bold=True)
+        font3 = Font(name='Times New Roman', size=14)
+        font4 = Font(name='Times New Roman', size=28, bold=True)
+        alignment1 = Alignment(horizontal='center', vertical='center', wrap_text = True)
+        alignment2 = Alignment(horizontal='left', vertical='center')
+        border_style = Border(left=Side(style='thin'), right=Side(style='thin'), top=Side(style='thin'), bottom=Side(style='thin'))
+        exam_date = datetime.now().strftime("%d.%m.%Y") # You may want to make this dynamic
+        exam_day = datetime.now().strftime("%A")
 
-    # Define the text and its formatting for B4
-    subtitle_text = "K.J. Somaiya College of Engineering"
-    ws['B4'] = subtitle_text
-    ws['B4'].font = font1
-    ws['B4'].alignment = alignment1
-    ws.merge_cells('B4:K4')
-    ws.row_dimensions[4].height = 20
-
-    # Define the text and its formatting for B5
-    subtitle_text = "Seating Arrangement"
-    ws['B5'] = subtitle_text
-    ws['B5'].font = font1
-    ws['B5'].alignment = alignment1
-    ws.merge_cells('B5:K5')
-    ws.row_dimensions[5].height = 20
-
-    # Define the text and its formatting for B6
-    subtitle_text = "November December 2023 Examination" #make this dynamic
-    ws['B6'] = subtitle_text
-    ws['B6'].font = font1
-    ws['B6'].alignment = alignment1
-    ws.merge_cells('B6:K6')
-    ws.row_dimensions[6].height = 20
-
-    # Define the text and its formatting for B9
-    subtitle_text = "Day/Date: Monday /04.12.2023             Session: Afternoon             Time 02.30 am to 05.30 pm" #make this dynamic
-    ws['B9'] = subtitle_text
-    ws['B9'].font = font2
-    ws['B9'].alignment = alignment1
-    ws.merge_cells('B9:K9')
-    ws.row_dimensions[9].height = 30
-
-    # Define the text and formatting for headers
-    headers = ["Programme", "Class", "Sem", "Course/ Subject", "Exam seat No.", "","Total No. of Students",
-               "Block No.", "Floor", "BLDG"]
-    ws['F11'] = 'From'
-    ws['G11'] = 'To'
-    for col_num, header in enumerate(headers, start=2):
-        cell = ws.cell(row=10, column=col_num, value=header)
-    for row in range(10, 12):  
-        for col in range(2, 12): 
-            cell = ws.cell(row=row, column=col)
-            cell.border = border_style
-            cell.font = font2
-            cell.alignment = alignment1
-    ws.merge_cells('B10:B11')
-    ws.merge_cells('C10:C11')
-    ws.merge_cells('D10:D11')
-    ws.merge_cells('E10:E11')
-    ws.merge_cells('F10:G10')
-    ws.merge_cells('H10:H11')
-    ws.merge_cells('I10:I11')
-    ws.merge_cells('J10:J11')
-    ws.merge_cells('K10:K11')
-    ws.row_dimensions[11].height = 35
-
-    # Start adding data from row 12
-    start_row = 12
-    prev_values = [None] * 4  # For Programme, Class(Year), Sem, Course
-    merge_starts = [None] * 4
-
-    floor_merge_start = None
-    building_merge_start = None
-    prev_floor = None
-    prev_building = None
-
-    building_names = {
-    'A': 'ARYABHATTA',
-    'B': 'BHASKARACHARYA'
-}
-    
-    for idx, entry in enumerate(seating_plan_data, start=1):
-        row = start_row + idx - 1
-        current_values = [
-            entry['programme'],  #Programme
-            entry['year'],  # Class(Year)
-            entry['semester'],# Semester
-            entry['subject'],  # Course
-        ]
+        ws.column_dimensions['A'].width = 6
+        ws.column_dimensions['B'].width = 13
+        ws.column_dimensions['C'].width = 6
+        ws.column_dimensions['D'].width = 5
+        ws.column_dimensions['E'].width = 13
+        ws.column_dimensions['F'].width = 17
+        ws.column_dimensions['G'].width = 17
+        ws.column_dimensions['H'].width = 11
+        ws.column_dimensions['I'].width = 9
+        ws.column_dimensions['J'].width = 7
+        ws.column_dimensions['K'].width = 7
         
-        #define row height
-        ws.row_dimensions[row].height = 40
+        # Define the text and its formatting for B2
+        title_text = "SOMAIYA VIDYAVIHAR UNIVERSITY"
+        ws['B2'] = title_text
+        ws['B2'].font = font1
+        ws['B2'].alignment = alignment1
+        ws.merge_cells('B2:K2')
+        ws.row_dimensions[2].height = 20
 
-        # Check for changes in values and merge cells if needed
-        for i in range(4):
-            if current_values[i] != prev_values[i]:
-                if merge_starts[i] is not None and merge_starts[i] < row - 1:
-                    ws.merge_cells(start_row=merge_starts[i], start_column=i+2, 
-                                   end_row=row-1, end_column=i+2)
-                merge_starts[i] = row
-                cell = ws.cell(row=row, column=i+2, value=current_values[i])
+        # Define the text and its formatting for B4
+        subtitle_text = "K.J. Somaiya College of Engineering"
+        ws['B4'] = subtitle_text
+        ws['B4'].font = font1
+        ws['B4'].alignment = alignment1
+        ws.merge_cells('B4:K4')
+        ws.row_dimensions[4].height = 20
+
+        # Define the text and its formatting for B5
+        subtitle_text = "Seating Arrangement"
+        ws['B5'] = subtitle_text
+        ws['B5'].font = font1
+        ws['B5'].alignment = alignment1
+        ws.merge_cells('B5:K5')
+        ws.row_dimensions[5].height = 20
+
+        # Define the text and its formatting for B6
+        subtitle_text = "November December 2023 Examination" #make this dynamic
+        ws['B6'] = subtitle_text
+        ws['B6'].font = font1
+        ws['B6'].alignment = alignment1
+        ws.merge_cells('B6:K6')
+        ws.row_dimensions[6].height = 20
+
+        # Define the text and its formatting for B9
+        subtitle_text = f"Day/Date: {exam_day} / {exam_date}            Session: Afternoon             Time: 02.30 am to 05.30 pm" #make this dynamic
+        ws['B9'] = subtitle_text
+        ws['B9'].font = font2
+        ws['B9'].alignment = alignment1
+        ws.merge_cells('B9:K9')
+        ws.row_dimensions[9].height = 30
+
+        # Define the text and formatting for headers
+        headers = ["Programme", "Class", "Sem", "Course/ Subject", "Exam seat No.", "","Total No. of Students",
+                "Block No.", "Floor", "BLDG"]
+        ws['F11'] = 'From'
+        ws['G11'] = 'To'
+        for col_num, header in enumerate(headers, start=2):
+            cell = ws.cell(row=10, column=col_num, value=header)
+        for row in range(10, 12):  
+            for col in range(2, 12): 
+                cell = ws.cell(row=row, column=col)
+                cell.border = border_style
+                cell.font = font2
+                cell.alignment = alignment1
+        ws.merge_cells('B10:B11')
+        ws.merge_cells('C10:C11')
+        ws.merge_cells('D10:D11')
+        ws.merge_cells('E10:E11')
+        ws.merge_cells('F10:G10')
+        ws.merge_cells('H10:H11')
+        ws.merge_cells('I10:I11')
+        ws.merge_cells('J10:J11')
+        ws.merge_cells('K10:K11')
+        ws.row_dimensions[11].height = 35
+
+        # Start adding classroom data from row 12
+        start_row = 12
+        prev_values = [None] * 4  # For Programme, Class(Year), Sem, Course
+        merge_starts = [None] * 4
+        floor_merge_start = None
+        building_merge_start = None
+        prev_floor = None
+        prev_building = None
+        
+        for idx, entry in enumerate(data, start=1):
+            row = start_row + idx - 1
+            current_values = [
+                entry['programme'],  #Programme
+                entry['year'],  # Class(Year)
+                entry['semester'],# Semester
+                entry['subject'],  # Course
+            ]
+            
+            #define row height
+            ws.row_dimensions[row].height = 40
+
+            # Check for changes in values and merge cells if needed
+            for i in range(4):
+                if current_values[i] != prev_values[i]:
+                    if merge_starts[i] is not None and merge_starts[i] < row - 1:
+                        ws.merge_cells(start_row=merge_starts[i], start_column=i+2, 
+                                    end_row=row-1, end_column=i+2)
+                    merge_starts[i] = row
+                    cell = ws.cell(row=row, column=i+2, value=current_values[i])
+                    cell.border = border_style
+                    cell.font = font3
+                    cell.alignment = alignment1
+                prev_values[i] = current_values[i]
+
+            # Add other values
+            ws.cell(row=row, column=6, value=entry['roll_range'].split(' - ')[0])
+            ws.cell(row=row, column=7, value=entry['roll_range'].split(' - ')[1])
+            ws.cell(row=row, column=8, value=entry['num_students'])
+            ws.cell(row=row, column=9, value=entry['classroom'])
+            
+            # Floor merging
+            current_floor = entry['classroom'][1]   
+            if current_floor != prev_floor:
+                if floor_merge_start is not None:
+                    ws.merge_cells(start_row=floor_merge_start, start_column=10, 
+                                end_row=row-1, end_column=10)
+                floor_merge_start = row
+                cell = ws.cell(row=row, column=10, value=current_floor)
                 cell.border = border_style
                 cell.font = font3
                 cell.alignment = alignment1
-            prev_values[i] = current_values[i]
+            prev_floor = current_floor
 
-        # Add other values
-        ws.cell(row=row, column=6, value=entry['roll_range'].split(' - ')[0])
-        ws.cell(row=row, column=7, value=entry['roll_range'].split(' - ')[1])
-        ws.cell(row=row, column=8, value=entry['num_students'])
-        ws.cell(row=row, column=9, value=entry['classroom'])
+            # Building merging
+            current_building = entry['classroom'][0]
+            if current_building != prev_building:
+                if building_merge_start is not None:
+                    ws.merge_cells(start_row=building_merge_start, start_column=11, 
+                                end_row=row-1, end_column=11)
+                building_merge_start = row
+                cell = ws.cell(row=row, column=11, value=current_building)
+                cell.border = border_style
+                cell.font = font4
+                cell.alignment = alignment1
+            prev_building = current_building
+
+            # Apply styling to the non-merged data cells
+            for col in range(6, 10):
+                cell = ws.cell(row=row, column=col)
+                cell.border = border_style
+                cell.font = font3
+                cell.alignment = alignment1
+
+        # Perform final merges for the last group of rows
+        for i in range(4):
+            if merge_starts[i] is not None and merge_starts[i] < row:
+                ws.merge_cells(start_row=merge_starts[i], start_column=i+2, 
+                            end_row=row, end_column=i+2)
+
+        # Final merges for floor and building
+        if floor_merge_start is not None:
+            ws.merge_cells(start_row=floor_merge_start, start_column=10, 
+                        end_row=row, end_column=10)
+        if building_merge_start is not None:
+            ws.merge_cells(start_row=building_merge_start, start_column=11, 
+                        end_row=row, end_column=11)
         
-        # Floor merging
-        current_floor = entry['classroom'][1]   
-        if current_floor != prev_floor:
-            if floor_merge_start is not None:
-                ws.merge_cells(start_row=floor_merge_start, start_column=10, 
-                               end_row=row-1, end_column=10)
-            floor_merge_start = row
-            cell = ws.cell(row=row, column=10, value=current_floor)
-            cell.border = border_style
-            cell.font = font3
-            cell.alignment = alignment1
-        prev_floor = current_floor
+        # Calculate total height
+        total_height = sum(ws.row_dimensions[r].height for r in range(start_row, row + 1))
+        
+        # Add decorative image
+        static_folder = app.static_folder
+        image_path = os.path.join(static_folder, 'Picture2.png')
+        img = Image(image_path)
+        img.height = total_height*1.33 + 350
+        img.width = 43
+        ws.add_image(img, 'A1')
+        image_path = os.path.join(static_folder, 'Picture1.png')
+        img = Image(image_path)
+        img.height = total_height*1.33 + 350
+        img.width = 27
+        ws.add_image(img, 'A1')
 
-        # Building merging
-        current_building = building_names.get(entry['classroom'][0])
-        if current_building != prev_building:
-            if building_merge_start is not None:
-                ws.merge_cells(start_row=building_merge_start, start_column=11, 
-                               end_row=row-1, end_column=11)
-            building_merge_start = row
-            cell = ws.cell(row=row, column=11, value=current_building)
-            cell.border = border_style
-            cell.font = font4
-            cell.alignment = alignment1
-        prev_building = current_building
+        # If total height exceeds 500px, change building to full names
+        if total_height > 500:
+            full_building_names = {
+                'A': 'ARYABHAT',
+                'B': 'BHASKARACHARYA'
+            }
+            for r in range(start_row, row + 1):
+                cell = ws.cell(row=r, column=11)
+                if cell.value in ['A', 'B']:
+                    cell.value = full_building_names[cell.value]
 
-        # Apply styling to the non-merged data cells
-        for col in range(6, 10):
-            cell = ws.cell(row=row, column=col)
-            cell.border = border_style
-            cell.font = font3
-            cell.alignment = alignment1
+        # Define the text and formatting for footer
+        footer_text = f"Date: {exam_date}" #make dynamic
+        ws[f'B{row+3}'] = footer_text
+        ws[f'B{row+3}'].font = font2
+        ws[f'B{row+3}'].alignment = alignment2
+        footer_text = "EIC"
+        ws[f'I{row+3}'] = footer_text
+        ws[f'I{row+3}'].font = font2
+        ws[f'I{row+3}'].alignment = alignment2
 
-    # Perform final merges for the last group of rows
-    for i in range(4):
-        if merge_starts[i] is not None and merge_starts[i] < row:
-            ws.merge_cells(start_row=merge_starts[i], start_column=i+2, 
-                           end_row=row, end_column=i+2)
-
-    # Final merges for floor and building
-    if floor_merge_start is not None:
-        ws.merge_cells(start_row=floor_merge_start, start_column=10, 
-                       end_row=row, end_column=10)
-    if building_merge_start is not None:
-        ws.merge_cells(start_row=building_merge_start, start_column=11, 
-                       end_row=row, end_column=11)
-    
-    # Define the text and formatting for footer
-    footer_text = "Date: 04.12.2023" #make dynamic
-    ws[f'B{row+3}'] = footer_text
-    ws[f'B{row+3}'].font = font2
-    ws[f'B{row+3}'].alignment = alignment2
-    footer_text = "EIC"
-    ws[f'I{row+3}'] = footer_text
-    ws[f'I{row+3}'].font = font2
-    ws[f'I{row+3}'].alignment = alignment2
+    # Remove the default sheet created by Workbook()
+    wb.remove(wb['Sheet'])
 
     return wb
 
@@ -328,6 +363,7 @@ def create_roll_call_excel(classroom_data):
         alignment3 = Alignment(horizontal='left', vertical='center', wrap_text=True)
         alignment4 = Alignment(horizontal='right', vertical='center')
         alignment5 = Alignment(horizontal='center', vertical='center', wrap_text=True)
+        exam_date = datetime.now().strftime("%d.%m.%Y") # You may want to make this dynamic
 
         # Define the text and its formatting for A1
         title_text = "Somaiya Vidyavihar University"
@@ -440,7 +476,7 @@ def create_roll_call_excel(classroom_data):
         ws.row_dimensions[12].height = 20
         
         # Define the text and its formatting for A13
-        text1 = "Date :  04.12.2023" #take input
+        text1 = f"Date : {exam_date}" #take input
         ws['A13'] = text1
         ws['A13'].font = font2
         ws['A13'].alignment = alignment2
@@ -611,12 +647,12 @@ def roll_call_list():
         classroom_data[classroom] = {
             'subject_name': subject_info['name'],
             'subject_code': subject_code,
-            'programme': 'T.Y. B.Tech Computer Engineering',  # You may need to adjust this
+            'programme': data['students'].iloc[0]['Programme'],  # You may need to adjust this
             'semester': subject_info['semester'],
             'students': data['students'].to_dict(orient='records')
         }
 
-    exam_date = datetime.now().strftime("%d.%m.%Y")
+    exam_date = datetime.now().strftime("%d.%m.%Y") # You may want to make this dynamic
     exam_time = "2.30 PM - 5.30 PM"  # You may want to make this dynamic
     exam_session = "Afternoon"  # You may want to make this dynamic
 
