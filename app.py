@@ -90,6 +90,11 @@ def allocate_students_to_classrooms(students, classrooms, selected_subjects):
             capacity = classrooms[current_classroom]
 
             students_to_allocate = min(capacity, total_students - allocated_students)
+            if students_to_allocate < capacity:
+                new_class = current_classroom+"x"
+                available_classrooms.insert(0, new_class)
+                classrooms[new_class] = capacity-students_to_allocate
+
             allocation[current_classroom] = {
                 'subject': subject,
                 'students': subject_students.iloc[allocated_students:allocated_students + students_to_allocate]
@@ -247,7 +252,7 @@ def create_seating_plan_excel(seating_plan_data):
             ws.cell(row=row, column=6, value=entry['roll_range'].split(' - ')[0])
             ws.cell(row=row, column=7, value=entry['roll_range'].split(' - ')[1])
             ws.cell(row=row, column=8, value=entry['num_students'])
-            ws.cell(row=row, column=9, value=entry['classroom'])
+            ws.cell(row=row, column=9, value=entry['classroom'][0:4])
             
             # Floor merging
             current_floor = entry['classroom'][1]   
@@ -406,7 +411,7 @@ def create_roll_call_excel(classroom_data):
         ws['E9'].font = font2
         ws['E9'].alignment = alignment2
         # Define the text and its formatting for F9
-        text1 =  f"{classroom}"
+        text1 =  f"{classroom[0:4]}"
         ws['F9'] = text1
         ws['F9'].font = font2
         ws['F9'].alignment = alignment2
@@ -587,13 +592,12 @@ def seating_plan():
     
     selected_subjects = session['selected_subjects']
     allocation = allocate_students_to_classrooms(students_df, classrooms, selected_subjects)
-
     seating_plan_data = []
     for classroom, data in allocation.items():
         students = data['students']
         roll_numbers = students['Student Roll'].tolist()
         seating_plan_data.append({
-            'classroom': classroom,
+            'classroom': classroom[0:4],
             'subject': data['subject'],
             'num_students': len(students),
             'roll_range': f"{min(roll_numbers)} - {max(roll_numbers)}"
