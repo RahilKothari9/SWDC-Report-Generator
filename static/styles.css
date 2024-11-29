@@ -1,5 +1,5 @@
 body {
-  font-family: 'Marcellus', sans-serif;
+  font-family: 'Marcellus', sans-serif !important;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
@@ -17,7 +17,8 @@ main {
 h1 {
   font-family: 'Marcellus', serif;
   color: #b7202e; /* Power Red */
-  font-size: 3em;
+  font-size: 2.75em;
+  margin: 10px;
 }
 .container {
   border-radius: 6px; 
@@ -35,7 +36,7 @@ h1 {
   width: auto;
   max-width: 1200px;
   padding: 20px;
-  height: 100%;
+  height: 75vh;
   text-align: center;
 }
 
@@ -88,7 +89,7 @@ header {
 h1 {
   font-family: 'Marcellus', serif;
   color: #b7202e; /* Power Red */
-  margin-bottom: 45px;
+  /* margin-bottom: 45px; */
 }
   
 h2 {
@@ -141,6 +142,8 @@ input[type="submit"] {
   cursor: pointer;
   margin: 5px;
   border-radius: 4px;
+  width: 40%;
+  font-size: 16px;
 }
 
 input[type="submit"]:hover {
@@ -193,4 +196,76 @@ footer {
   padding: 20px;
   padding-left: 10px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+}
+
+
+
+select {
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #333333;
+  font-size: 16px;
+  width: 100%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  outline: none;
+  font-family: 'Marcellus', sans-serif;  /* Make sure the font matches the rest of the page */
+  appearance: none; /* Removes default browser-specific styling to allow custom design */
+}
+
+select:focus {
+  border-color: #b7202e;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+select:hover {
+  border-color: #ed1c24;
+  cursor: pointer;
+}
+
+/* Option Styling */
+option {
+  background-color: #ffffff; /* Background for options */
+  color: #333333;
+  font-family: 'Marcellus', sans-serif; /* Make sure the font matches */
+  padding: 10px;
+}
+
+/* Change highlight color when an option is selected or hovered */
+select option:checked {
+  background-color: #b7202e; /* Power Red for selected option */
+  color: #ffffff; /* White text to make it readable */
+}
+
+select option:hover {
+  background-color: #ed1c24; /* Vitality Red for hover */
+  color: #ffffff;
+}
+
+
+.generate-reports {
+  text-align: center;
+}
+
+.reports-links {
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* Space between links */
+  margin-top: 10px;
+}
+
+.report-link {
+  /* Remove underline from links */
+  color: #000000; /* Default link color */
+  text-decoration: underline;
+  transition: color 0.2s ease; /* Smooth transition effect */
+  font-size: 19px;
+}
+
+.report-link:hover {
+  color: #b7202e; /* Power Red color on hover */
+  cursor: pointer; /* Pointer cursor on hover */
 }
