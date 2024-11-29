@@ -5,6 +5,7 @@ body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
+  background-color: #f2f2f2;
 }
   
 main {
@@ -12,6 +13,7 @@ main {
   display: flex; 
   justify-content: center; 
   flex-direction: column;
+   /* Adjust this value based on the header height */
 }
   
 h1 {
@@ -31,13 +33,28 @@ h1 {
   
 .container2 {
   border-radius: 6px; 
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */
   margin-left: 200px;
   width: auto;
   max-width: 1200px;
   padding: 20px;
   height: 75vh;
   text-align: center;
+}
+
+.container3 {
+  border-radius: 6px; 
+  /* box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); */
+  margin-left: 200px;
+  margin-top: 100px;
+  width: auto;
+  max-width: 1200px;
+  padding: 20px;
+  /* height: 75vh; */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .steps-grid {
@@ -76,6 +93,12 @@ header {
   margin: 0;
   padding: 0;
   border-bottom: #e7e8e9;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: #ffffff; /* Ensure the header has a background color */
+  height: 13%;
 }
   
 .logo {
@@ -89,7 +112,7 @@ header {
 h1 {
   font-family: 'Marcellus', serif;
   color: #b7202e; /* Power Red */
-  /* margin-bottom: 45px; */
+  margin-top: 25px;
 }
   
 h2 {
@@ -178,7 +201,7 @@ footer {
   left: 0;
   bottom: 0;
   width: 80px;
-  height: 80%;
+  height: 90%;
   background-color: #b7202e; 
   color: white;
   padding: 20px;
@@ -190,7 +213,7 @@ footer {
   left: 0;
   bottom: 0;
   width: 5px;
-  height: 80%;
+  height: 90%;
   background-color: #ed1c24; 
   color: white;
   padding: 20px;
@@ -248,13 +271,14 @@ select option:hover {
 
 .generate-reports {
   text-align: center;
+  margin-top: 15px;
 }
 
 .reports-links {
   display: flex;
   justify-content: center;
   gap: 20px; /* Space between links */
-  margin-top: 10px;
+  margin-top: 15px;
 }
 
 .report-link {

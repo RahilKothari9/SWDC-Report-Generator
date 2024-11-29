@@ -30,7 +30,7 @@
           <form method="POST" action="/upload" enctype="multipart/form-data" class="file-upload-form">
             <div class="file-upload-box">
               <label for="file" class="custom-file-upload">
-                <span>Choose File</span>
+                <span id="file-name">Choose File</span>
                 <input type="file" id="file" name="file" accept=".xlsx" required>
               </label>
               <p class="file-upload-instructions">Accepted formats: .xlsx</p>
@@ -67,5 +67,11 @@
   </main>
 
   <!-- <footer>&copy; KJSCE 2024</footer> -->
+  <script>
+    document.getElementById('file').addEventListener('change', function() {
+      var fileName = this.files[0].name;
+      document.getElementById('file-name').textContent = fileName;
+    });
+  </script>
 </body>
 </html>

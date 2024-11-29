@@ -4,9 +4,29 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Seating Plan</title>
+  <link rel="stylesheet" href="./../static/styles.css">
+
 </head>
 <body>
+
+  <header>
+    <img class="logo" src="https://kjsce.somaiya.edu/assets/kjsce/img/newlogo/KJSCE-Logo.svg" alt="logo" width="200px">
+  </header>
+  <div class="sidebar">
+    <div class="sidebar-content">
+      
+    </div>
+  </div>
+  <div class="container3">
   <h1>Seating Plan</h1>
+
+  <div class="generate-reports">
+    <div class="reports-links">
+      <a href="/download_seating_plan" class="report-link">Download Seating Plan</a>
+      <a href="/" class="report-link">Back to Home</a>
+    </div>
+  </div>
+  <br><br><br>
   <table border="1">
     <tr>
       <th>Classroom</th>
@@ -23,8 +43,9 @@
       </tr>
     {% endfor %}
   </table>
-  <a href="/download_seating_plan">Download Seating Plan Excel</a>
+  <!-- <a href="/download_seating_plan">Download Seating Plan Excel</a>
   <br>
-  <a href="/">Back to Home</a>
+  <a href="/">Back to Home</a> -->
+</div>
 </body>
 </html>
