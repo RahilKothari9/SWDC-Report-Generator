@@ -658,7 +658,7 @@ def roll_call_list():
 
     exam_date = datetime.now().strftime("%d.%m.%Y") # You may want to make this dynamic
     exam_time = "2.30 PM - 5.30 PM"  # You may want to make this dynamic
-    exam_session = "Afternoon"  # You may want to make this dynamic
+    exam_session = "Afternoon"  
 
     return render_template('roll_call_list.html', 
                            classroom_data=classroom_data, 

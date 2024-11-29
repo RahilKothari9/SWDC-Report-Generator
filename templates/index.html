@@ -12,39 +12,59 @@
 
 <body>
   <header>
-    <img class="logo" src="https://myaccount.somaiya.edu/img/somaiya-university-logo.svg" alt="logo" width="200px">
+    <img class="logo" src="https://kjsce.somaiya.edu/assets/kjsce/img/newlogo/KJSCE-Logo.svg" alt="logo" width="200px">
   </header>
+  <div class="sidebar">
+    <div class="sidebar-content">
+      
+    </div>
+  </div>
 
   <main>
     <div class="container2">
-      <h1>Classroom Management</h1>
+      <h1>Supervisor Report Generator</h1>
 
-      <h2>Step 1: Upload Student Data</h2>
-      <form method="POST" action="/upload" enctype="multipart/form-data">
-        <input type="file" id="file" name="file" accept=".xlsx" required><br>
-        <input type="submit" value="Upload">
-      </form>
-      
-      <h2>Step 2: Select Subjects</h2>
-      <form method="POST" action="/select_subjects">
-        <select name="subjects" id="subjects" multiple required>
-          {% for subject in subjects %}
-            <option value="{{ subject.course_code }}">{{ subject.name }} ({{ subject.course_code }})</option>
-          {% endfor %}
-        </select>
-        <br>
-        <input type="submit" value="Save Selected Subjects">
-      </form>
-    
-      <h2>Step 3: Generate Reports</h2>
-      <ul>
-        <li><a href="/seating_plan">Generate Seating Plan</a></li>
-        <li><a href="/roll_call_list">Generate Roll Call List</a></li>
-      </ul>
-  
+      <div class="steps-grid">
+        <div class="step step-one">
+          <h2>Step 1: Upload Student Data</h2>
+          <form method="POST" action="/upload" enctype="multipart/form-data" class="file-upload-form">
+            <div class="file-upload-box">
+              <label for="file" class="custom-file-upload">
+                <span>Choose File</span>
+                <input type="file" id="file" name="file" accept=".xlsx" required>
+              </label>
+              <p class="file-upload-instructions">Accepted formats: .xlsx</p>
+            </div>
+            <input type="submit" value="Upload">
+          </form>
+        </div>
+
+        <div class="step step-long">
+          <div class="step2">
+            <h2>Step 2: Select Subjects</h2>
+            <form method="POST" action="/select_subjects">
+              <select name="subjects" id="subjects" multiple required>
+                {% for subject in subjects %}
+                  <option value="{{ subject.course_code }}">{{ subject.name }} ({{ subject.course_code }})</option>
+                {% endfor %}
+              </select>
+              <br>
+              <input type="submit" value="Save Selected Subjects">
+            </form>
+          </div>
+
+          <div>
+            <h2>Step 3: Generate Reports</h2>
+            <ul>
+              <li><a href="/seating_plan">Generate Seating Plan</a></li>
+              <li><a href="/roll_call_list">Generate Roll Call List</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
-  <footer>&copy; KJSCE 2024</footer>
+  <!-- <footer>&copy; KJSCE 2024</footer> -->
 </body>
 </html>
