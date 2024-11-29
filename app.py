@@ -175,7 +175,7 @@ def create_seating_plan_excel(seating_plan_data):
         ws.row_dimensions[5].height = 20
 
         # Define the text and its formatting for B6
-        subtitle_text = "November December 2023 Examination" #make this dynamic
+        subtitle_text = "November December 2024 Examination" #make this dynamic
         ws['B6'] = subtitle_text
         ws['B6'].font = font1
         ws['B6'].alignment = alignment1
@@ -385,7 +385,7 @@ def create_roll_call_excel(classroom_data):
         ws.merge_cells('A3:H3')
 
         # Define the text and its formatting for A6
-        text1 = "ATTENDANCE OF CANDIDATES WHO ARE PRESENT FOR THE EXAMINATION NOV-DEC 2023        College  Code: 16" #make this dynamic
+        text1 = "ATTENDANCE OF CANDIDATES WHO ARE PRESENT FOR THE EXAMINATION NOV-DEC 2024        College  Code: 16" #make this dynamic
         ws['A6'] = text1
         ws['A6'].font = font2
         ws['A6'].alignment = alignment1
