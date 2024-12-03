@@ -293,3 +293,26 @@ select option:hover {
   color: #b7202e; /* Power Red color on hover */
   cursor: pointer; /* Pointer cursor on hover */
 }
+
+
+.configure {
+  margin-top: 13vh;
+  margin-left: 10vw;
+  flex-grow: 1;
+  margin-bottom: 4vh;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  height: 13vh;
+  width: 100vw;
+}
+
+.grower{
+  flex-grow: 1;
+}
+
+.namer{
+  margin-right: 3vw;
+}

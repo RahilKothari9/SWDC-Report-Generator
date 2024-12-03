@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_file
+from flask import Flask, render_template, request, redirect, url_for, session, send_file, jsonify
 import pandas as pd
 import os
 from datetime import datetime
@@ -30,38 +30,16 @@ classrooms = {
     'B204': 30,
     'B205': 30,
     'B301': 30,
-    'B302': 30,
-    'B303': 30,
-    'B304': 30,
-    'B305': 30,
-    'B401': 30,
-    'B402': 30,
-    'B403': 30,
-    'B404': 30,
-    'A101': 30,
     # Add or edit classrooms as needed
 }
 
 
 # Example subjects with specified course codes
 subjects = [
-    {'name': 'Digital Design Laboratory', 'course_code': 'DDL', 'semester': 3},
-    {'name': 'Integral Transform and Vector Calculus', 'course_code': 'ITVC', 'semester': 3},
-    {'name': 'Object Oriented Programming Methodology', 'course_code': 'OOPM', 'semester': 3},
-    {'name': 'Computer Organisation and Architecture', 'course_code': 'COA', 'semester': 3},
-    {'name': 'Theory of Automata and Compiler Design', 'course_code': 'TACD', 'semester': 4},
-    {'name': 'Relational Database Management System', 'course_code': 'RDBMS', 'semester': 4},
-    {'name': 'Probability, Statistics and Optimization Techniques', 'course_code': 'PSOT', 'semester': 4},
-    {'name': 'Analysis of Algorithms', 'course_code': 'AOA', 'semester': 4},
-    {'name': 'MERN Stack', 'course_code': 'MERN', 'semester': 5},
     {'name': 'Operating Systems', 'course_code': 'OS', 'semester': 5},
     {'name': 'Computer Networks', 'course_code': 'CN', 'semester': 5},
     {'name': 'Soft Computing', 'course_code': 'E-SC', 'semester': 5},
-    {'name': 'Computer Graphics', 'course_code': 'E-CG', 'semester': 5},
-    {'name': 'Database Management systems', 'course_code': 'DBMS', 'semester': 3},
-    {'name': 'Discrete and Applied Mathematics', 'course_code': 'DAM', 'semester': 3},
-    {'name': 'Data Communication and Networking', 'course_code': 'DCN', 'semester': 3},
-    {'name': 'Data Structures', 'course_code': 'DS', 'semester': 3},
+    {'name': 'Computer Graphics', 'course_code': 'E-CG', 'semester': 5}
 ]
 
 students_df = pd.DataFrame(columns=['Year', 'Programme', 'Semester', 'Student Roll', 'Name', 
@@ -90,10 +68,23 @@ def allocate_students_to_classrooms(students, classrooms, selected_subjects):
             capacity = classrooms[current_classroom]
 
             students_to_allocate = min(capacity, total_students - allocated_students)
-            if students_to_allocate < capacity:
-                new_class = current_classroom+"x"
-                available_classrooms.insert(0, new_class)
-                classrooms[new_class] = capacity-students_to_allocate
+
+
+
+
+
+
+
+            # Uncomment the following block to share classes between subjects
+
+
+
+
+
+            # if students_to_allocate < capacity:
+            #     new_class = current_classroom+"x"
+            #     available_classrooms.insert(0, new_class)
+            #     classrooms[new_class] = capacity-students_to_allocate
 
             allocation[current_classroom] = {
                 'subject': subject,
@@ -159,7 +150,7 @@ def create_seating_plan_excel(seating_plan_data):
         ws.row_dimensions[2].height = 20
 
         # Define the text and its formatting for B4
-        subtitle_text = "K.J. Somaiya College of Engineering"
+        subtitle_text = "K.J. Somaiya School of Engineering"
         ws['B4'] = subtitle_text
         ws['B4'].font = font1
         ws['B4'].alignment = alignment1
@@ -378,14 +369,14 @@ def create_roll_call_excel(classroom_data):
         ws.merge_cells('A1:H1')
 
         # Define the text and its formatting for A3
-        subtitle_text = "K.J. Somaiya College of Engineering"
+        subtitle_text = "K.J. Somaiya School of Engineering"
         ws['A3'] = subtitle_text
         ws['A3'].font = font1
         ws['A3'].alignment = alignment1
         ws.merge_cells('A3:H3')
 
         # Define the text and its formatting for A6
-        text1 = "ATTENDANCE OF CANDIDATES WHO ARE PRESENT FOR THE EXAMINATION NOV-DEC 2024        College  Code: 16" #make this dynamic
+        text1 = "ATTENDANCE OF CANDIDATES WHO ARE PRESENT FOR THE EXAMINATION NOV-DEC 2024        School  Code: 16" #make this dynamic
         ws['A6'] = text1
         ws['A6'].font = font2
         ws['A6'].alignment = alignment1
@@ -693,6 +684,44 @@ def download_roll_call_list():
     output.seek(0)
 
     return send_file(output, download_name='roll_call_list.xlsx', as_attachment=True, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+
+
+
+@app.route('/configure', methods=['GET', 'POST'])
+def configure():
+    global classrooms, subjects
+
+    if request.method == 'POST':
+        # Handle adding classrooms
+        if 'classroom' in request.form and 'capacity' in request.form:
+            classroom = request.form['classroom']
+            capacity = int(request.form['capacity'])
+            classrooms[classroom] = capacity
+
+        # Handle adding subjects
+        elif 'name' in request.form and 'course_code' in request.form and 'semester' in request.form:
+            name = request.form['name']
+            course_code = request.form['course_code']
+            semester = int(request.form['semester'])
+            subjects.append({"name": name, "course_code": course_code, "semester": semester})
+
+    return render_template('configure.html', classrooms=classrooms, subjects=subjects)
+
+@app.route('/delete_classroom', methods=['POST'])
+def delete_classroom():
+    classroom_to_delete = request.json.get('classroom')
+    if classroom_to_delete in classrooms:
+        del classrooms[classroom_to_delete]
+        return jsonify({'status': 'success', 'message': f'Classroom {classroom_to_delete} deleted successfully'})
+    return jsonify({'status': 'error', 'message': f'Classroom {classroom_to_delete} not found'})
+
+@app.route('/delete_subject', methods=['POST'])
+def delete_subject():
+    course_code_to_delete = request.json.get('course_code')
+    global subjects
+    subjects = [s for s in subjects if s['course_code'] != course_code_to_delete]
+    return jsonify({'status': 'success', 'message': f'Subject {course_code_to_delete} deleted successfully'})
+
 
 if __name__ == '__main__':
     app.run(debug=True)

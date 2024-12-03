@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration Page</title>
+    <link rel="stylesheet" href="./../static/styles.css">    
+    <script>
+        // JavaScript for delete functionality
+        function deleteClassroom(classroom) {
+            if (confirm(`Are you sure you want to delete classroom ${classroom}?`)) {
+                fetch('/delete_classroom', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ classroom }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.status === 'success') location.reload();
+                })
+                .catch(err => console.error('Error:', err));
+            }
+        }
+
+        function deleteSubject(courseCode) {
+            if (confirm(`Are you sure you want to delete subject ${courseCode}?`)) {
+                fetch('/delete_subject', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ course_code: courseCode }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.status === 'success') location.reload();
+                })
+                .catch(err => console.error('Error:', err));
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <header>
+        <img class="logo" src="https://kjsce.somaiya.edu/assets/kjsce/img/newlogo/KJSCE-Logo.svg" alt="logo" width="200px">
+        <div class="grower"></div>
+    <!-- <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZM9Jm0eD9QtiKb7bcbsZB2i3jywBL0U_vmQ&s" width="25px" height="25px"> -->
+    <a href="../" class="namer"><p><p></p>Home</p></a>
+      </header>
+      <div class="sidebar">
+        <div class="sidebar-content">
+          
+        </div>
+      </div>
+    <div class="configure">
+    <h1>Configuration Page</h1>
+
+    <!-- Add Classroom Form -->
+    <h2>Add Classroom</h2>
+    <form method="POST" action="/configure">
+        <label for="classroom">Classroom:</label>
+        <input type="text" id="classroom" name="classroom" required>
+        <label for="capacity">Capacity:</label>
+        <input type="number" id="capacity" name="capacity" required>
+        <button type="submit">Add Classroom</button>
+    </form>
+
+    <!-- Classroom List -->
+    <h3>Classrooms</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Classroom</th>
+                <th>Capacity</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for classroom, capacity in classrooms.items() %}
+            <tr>
+                <td>{{ classroom }}</td>
+                <td>{{ capacity }}</td>
+                <td>
+                    <button onclick="deleteClassroom('{{ classroom }}')">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Add Subject Form -->
+    <h2>Add Subject</h2>
+    <form method="POST" action="/configure">
+        <label for="name">Course Name:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="course_code">Course Code:</label>
+        <input type="text" id="course_code" name="course_code" required>
+        <label for="semester">Semester:</label>
+        <input type="number" id="semester" name="semester" required>
+        <button type="submit">Add Subject</button>
+    </form>
+
+    <!-- Subject List -->
+    <h3>Subjects</h3>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Course Name</th>
+                <th>Course Code</th>
+                <th>Semester</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for subject in subjects %}
+            <tr>
+                <td>{{ subject.name }}</td>
+                <td>{{ subject.course_code }}</td>
+                <td>{{ subject.semester }}</td>
+                <td>
+                    <button onclick="deleteSubject('{{ subject.course_code }}')">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
