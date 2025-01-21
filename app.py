@@ -39,7 +39,11 @@ subjects = [
     {'name': 'Operating Systems', 'course_code': 'OS', 'semester': 5},
     {'name': 'Computer Networks', 'course_code': 'CN', 'semester': 5},
     {'name': 'Soft Computing', 'course_code': 'E-SC', 'semester': 5},
-    {'name': 'Computer Graphics', 'course_code': 'E-CG', 'semester': 5}
+    {'name': 'Computer Graphics', 'course_code': 'E-CG', 'semester': 5},
+    {'name': 'OOPM', 'course_code': 'OOPM', 'semester': 3},
+    {'name': 'Computer Organisation And Architecture', 'course_code': 'COA', 'semester': 3},
+    {'name': 'Discrete Mathematics', 'course_code': 'DSM', 'semester': 3},
+    {'name': 'ITVC', 'course_code': 'ITVC', 'semester': 3}
 ]
 
 students_df = pd.DataFrame(columns=['Year', 'Programme', 'Semester', 'Student Roll', 'Name', 
