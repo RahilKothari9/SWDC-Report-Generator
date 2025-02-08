@@ -11,6 +11,7 @@ from io import BytesIO
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.secret_key = '3d6f45a5fc12445dbac2f59c3b6c7cb1'
+app.config['ALLOW_CLASS_SHARING'] = False
 
 # Ensure the upload directory exists
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
@@ -77,20 +78,19 @@ def allocate_students_to_classrooms(students, classrooms, selected_subjects):
     allocation = {}
     available_classrooms = [room for room, details in classrooms.items() if details['status'] == 'enabled']
 
-    for subject_name in selected_subjects:
-        # Look up subject info using the subject name
-        subject_info = next((s for s in subjects if s['name'] == subject_name), None)
+    for subject in selected_subjects:
+        # Lookup subject info by name (if you’re now passing subject name)
+        subject_info = next((s for s in subjects if s['name'] == subject), None)
         if subject_info is None:
-            continue  # Skip if the subject name is not found in your subjects list
+            continue
         course_code = subject_info['course_code']
 
-        # Filter students based on the corresponding course code
         subject_students = students[students.apply(
             lambda x: course_code in x[['Course Code 1', 'Course Code 2', 'Course Code 3', 'Course Code 4', 'Course Code 5',
                                         'Course Code 6', 'Course Code 7', 'Course Code 8', 'Course Code 9', 'Course Code 10']].values,
             axis=1
         )]
-        
+
         if subject_students.empty:
             continue
 
@@ -99,18 +99,24 @@ def allocate_students_to_classrooms(students, classrooms, selected_subjects):
 
         while allocated_students < total_students:
             if not available_classrooms:
-                raise Exception(f"Not enough classrooms to allocate all students for {subject_name}")
+                raise Exception(f"Not enough classrooms to allocate all students for {subject}")
             current_classroom = available_classrooms.pop(0)
             capacity = classrooms[current_classroom]['capacity']
             students_to_allocate = min(capacity, total_students - allocated_students)
 
             allocation[current_classroom] = {
-                'subject': subject_name,  # store the subject name rather than the course code
+                'subject': subject,  # subject name stored here
                 'students': subject_students.iloc[allocated_students:allocated_students + students_to_allocate]
             }
             allocated_students += students_to_allocate
 
-            # Continue allocation if more students remain and more classrooms are available.
+            # If sharing is enabled and there's leftover capacity, create a new classroom with the leftover.
+            if app.config.get('ALLOW_CLASS_SHARING', False) and (students_to_allocate < capacity):
+                new_class = current_classroom + "x"
+                available_classrooms.insert(0, new_class)
+                classrooms[new_class] = {'capacity': capacity - students_to_allocate, 'status': 'enabled'}
+
+            # Continue to the next classroom if needed
             if allocated_students < total_students:
                 continue
             elif available_classrooms:
@@ -119,6 +125,7 @@ def allocate_students_to_classrooms(students, classrooms, selected_subjects):
                 return allocation
 
     return allocation
+
 
 def create_seating_plan_excel(seating_plan_data):
     wb = Workbook()
@@ -669,19 +676,28 @@ def configure():
     global classrooms, subjects
 
     if request.method == 'POST':
+        # Check if the form submission is for updating the share option.
+        if 'allow_class_sharing' in request.form:
+            # The checkbox sends 'on' when checked; if not present, assume False.
+            app.config['ALLOW_CLASS_SHARING'] = request.form.get('allow_class_sharing') == 'on'
+        
         # Handle adding classrooms
         if 'classroom' in request.form and 'capacity' in request.form:
             classroom = request.form['classroom']
             capacity = int(request.form['capacity'])
             classrooms[classroom] = {'capacity': capacity, 'status': 'enabled'}
-        # Handle adding subjects (now including scheme)
+        
+        # Handle adding subjects
         elif 'name' in request.form and 'course_code' in request.form and 'semester' in request.form:
             name = request.form['name']
             course_code = request.form['course_code']
             semester = int(request.form['semester'])
             scheme = request.form.get('scheme', '')
             subjects.append({"name": name, "course_code": course_code, "semester": semester, "scheme": scheme})
-    return render_template('configure.html', classrooms=classrooms, subjects=subjects)
+            
+    # Pass the current option value to the template.
+    return render_template('configure.html', classrooms=classrooms, subjects=subjects, allow_class_sharing=app.config['ALLOW_CLASS_SHARING'])
+
 
 @app.route('/delete_classroom', methods=['POST'])
 def delete_classroom():

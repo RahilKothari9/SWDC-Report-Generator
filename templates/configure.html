@@ -86,6 +86,16 @@
   <div class="configure">
     <h1>Configuration Page</h1>
 
+    <!-- New Section: Toggle for Class Sharing -->
+    <h2>General Options</h2>
+    <form method="POST" action="/configure">
+      <label for="allow_class_sharing">Allow class sharing between subjects:</label>
+      <input type="checkbox" id="allow_class_sharing" name="allow_class_sharing" 
+             {% if allow_class_sharing %} checked {% endif %}>
+      <button type="submit">Save Option</button>
+    </form>
+    <hr>
+
     <!-- Add Classroom Form -->
     <h2>Add Classroom</h2>
     <form method="POST" action="/configure">
