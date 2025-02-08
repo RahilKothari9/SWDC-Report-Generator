@@ -79,7 +79,7 @@ def allocate_students_to_classrooms(students, classrooms, selected_subjects):
     available_classrooms = [room for room, details in classrooms.items() if details['status'] == 'enabled']
 
     for subject in selected_subjects:
-        # Lookup subject info by name (if you’re now passing subject name)
+        # Lookup subject info by name
         subject_info = next((s for s in subjects if s['name'] == subject), None)
         if subject_info is None:
             continue
@@ -126,14 +126,17 @@ def allocate_students_to_classrooms(students, classrooms, selected_subjects):
 
     return allocation
 
-
 def create_seating_plan_excel(seating_plan_data):
     wb = Workbook()
     building_data = {}
     for entry in seating_plan_data:
-        building = entry['classroom'][0]
+        # For display purposes, strip any trailing "x"
+        base_classroom = entry['classroom'].rstrip('x')
+        building = base_classroom[0]
         if building not in building_data:
             building_data[building] = []
+        # Save the stripped classroom name in the entry for display
+        entry['classroom'] = base_classroom
         building_data[building].append(entry)
 
     # Create separate sheets for each building
@@ -252,12 +255,15 @@ def create_seating_plan_excel(seating_plan_data):
                     cell.alignment = alignment1
                 prev_values[i] = current_values[i]
 
+            # Use the stripped classroom for roll range and floor/building details.
+            base_classroom = entry['classroom']
             ws.cell(row=row, column=6, value=entry['roll_range'].split(' - ')[0])
             ws.cell(row=row, column=7, value=entry['roll_range'].split(' - ')[1])
             ws.cell(row=row, column=8, value=entry['num_students'])
-            ws.cell(row=row, column=9, value=entry['classroom'][0:4])
+            ws.cell(row=row, column=9, value=base_classroom[:4])
             
-            current_floor = entry['classroom'][1]   
+            # Use base_classroom for floor and building.
+            current_floor = base_classroom[1]   
             if current_floor != prev_floor:
                 if floor_merge_start is not None:
                     ws.merge_cells(start_row=floor_merge_start, start_column=10, 
@@ -269,7 +275,7 @@ def create_seating_plan_excel(seating_plan_data):
                 cell.alignment = alignment1
             prev_floor = current_floor
 
-            current_building = entry['classroom'][0]
+            current_building = base_classroom[0]
             if current_building != prev_building:
                 if building_merge_start is not None:
                     ws.merge_cells(start_row=building_merge_start, start_column=11, 
@@ -339,6 +345,8 @@ def create_roll_call_excel(classroom_data):
     wb = Workbook()
     
     for classroom, data in classroom_data.items():
+        # For display, strip any trailing "x" from the classroom name.
+        display_classroom = classroom.rstrip('x')
         ws = wb.create_sheet(title=f"Classroom {classroom}")
 
         ws.column_dimensions['A'].width = 7
@@ -397,7 +405,7 @@ def create_roll_call_excel(classroom_data):
         ws['E9'] = text1
         ws['E9'].font = font2
         ws['E9'].alignment = alignment2
-        text1 = f"{classroom[0:4]}"
+        text1 = f"{display_classroom[0:4]}"
         ws['F9'] = text1
         ws['F9'].font = font2
         ws['F9'].alignment = alignment2
@@ -563,19 +571,15 @@ def seating_plan():
         # Look up the subject info from the subjects list using subject name.
         subject_info = next((s for s in subjects if s['name'] == data['subject']), {})
         seating_plan_data.append({
-            'classroom': classroom,
-            # Use the subject name from subject_info if found; otherwise fallback to data['subject']
+            'classroom': classroom.rstrip('x'),  # Strip trailing x's for display
             'subject': subject_info.get('name', data['subject']),
-            # Use the subject details from the lookup; if not found, fallback to the student data
             'semester': subject_info.get('semester', students['Semester'].iloc[0] if not students.empty else ''),
             'scheme': subject_info.get('scheme', ''),
             'num_students': len(students),
             'roll_range': f"{min(roll_numbers)} - {max(roll_numbers)}"
         })
 
-    # Note: You no longer need to pass "subjects" to the template.
     return render_template('seating_plan.html', seating_plan=seating_plan_data)
-
 
 @app.route('/download_seating_plan')
 def download_seating_plan():
@@ -590,7 +594,7 @@ def download_seating_plan():
         students = data['students']
         roll_numbers = students['Student Roll'].tolist()
         seating_plan_data.append({
-            'classroom': classroom,
+            'classroom': classroom.rstrip('x'),
             'subject': data['subject'],
             'num_students': len(students),
             'programme': students['Programme'].iloc[0] if not students.empty else '',
@@ -618,10 +622,11 @@ def roll_call_list():
     classroom_data = {}
     for classroom, data in allocation.items():
         subject_info = next((subject for subject in subjects if subject['name'] == data['subject']), None)
-
         if subject_info is None:
             continue
-        classroom_data[classroom] = {
+        # Save display_classroom as the classroom name stripped of trailing x's.
+        display_classroom = classroom.rstrip('x')
+        classroom_data[display_classroom] = {
             'subject_name': subject_info['name'],
             'subject_code': subject_info['course_code'],
             'scheme': subject_info['scheme'],
@@ -651,10 +656,10 @@ def download_roll_call_list():
     classroom_data = {}
     for classroom, data in allocation.items():
         subject_info = next((subject for subject in subjects if subject['name'] == data['subject']), None)
-
         if subject_info is None:
             continue
-        classroom_data[classroom] = {
+        display_classroom = classroom
+        classroom_data[display_classroom] = {
             'subject_name': subject_info['name'],
             'subject_code': subject_info['course_code'],
             'scheme': subject_info['scheme'],
@@ -697,7 +702,6 @@ def configure():
             
     # Pass the current option value to the template.
     return render_template('configure.html', classrooms=classrooms, subjects=subjects, allow_class_sharing=app.config['ALLOW_CLASS_SHARING'])
-
 
 @app.route('/delete_classroom', methods=['POST'])
 def delete_classroom():
