@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,24 +8,20 @@
   <meta content="Automatic seating generator for K.J. Somaiya School of Engineering" name="description" />
   <link rel="stylesheet" href="./../static/styles.css">
 </head>
-
 <body>
   <header>
     <img class="logo" src="./../static/logo.png" alt="logo" width="200px">
     <div class="grower"></div>
-    <!-- <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZM9Jm0eD9QtiKb7bcbsZB2i3jywBL0U_vmQ&s" width="25px" height="25px"> -->
     <a href="./configure" class="namer"><p><p></p>Configure</p></a>
   </header>
   <div class="sidebar">
     <div class="sidebar-content">
-      
+      <!-- Sidebar content if needed -->
     </div>
   </div>
-
   <main>
     <div class="container2">
       <h1>Supervisor Report Generator</h1>
-
       <div class="steps-grid">
         <div class="step step-one">
           <h2>Step 1: Upload Student Data</h2>
@@ -41,21 +36,21 @@
             <input type="submit" value="Upload">
           </form>
         </div>
-
         <div class="step step-long">
           <div class="step2">
             <h2>Step 2: Select Subjects</h2>
             <form method="POST" action="/select_subjects">
               <select name="subjects" id="subjects" multiple required>
                 {% for subject in subjects %}
-                  <option value="{{ subject.course_code }}">{{ subject.name }} ({{ subject.course_code }})</option>
+                  <option value="{{ subject.name }}">
+                    {{ subject.name }} – Semester {{ subject.semester }} – Scheme {{ subject.scheme }}
+                  </option>
                 {% endfor %}
               </select>
               <br>
-              <input type="submit" value="Save ">
+              <input type="submit" value="Save">
             </form>
           </div>
-
           <div class="generate-reports">
             <h2>Step 3: Generate Reports</h2>
             <div class="reports-links">
@@ -63,13 +58,10 @@
               <a href="/roll_call_list" class="report-link">Generate Roll Call List</a>
             </div>
           </div>
-          
         </div>
       </div>
     </div>
   </main>
-
-  <!-- <footer>&copy; KJSCE 2024</footer> -->
   <script>
     document.getElementById('file').addEventListener('change', function() {
       var fileName = this.files[0].name;

@@ -5,47 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Seating Plan</title>
   <link rel="stylesheet" href="./../static/styles.css">
-
 </head>
 <body>
-
   <header>
     <img class="logo" src="./../static/logo.png" alt="logo" width="200px">
   </header>
   <div class="sidebar">
     <div class="sidebar-content">
-      
+      <!-- Sidebar content if needed -->
     </div>
   </div>
   <div class="container3">
-  <h1>Seating Plan</h1>
-
-  <div class="generate-reports">
-    <div class="reports-links">
-      <a href="/download_seating_plan" class="report-link">Download Seating Plan</a>
-      <a href="/" class="report-link">Back to Home</a>
+    <h1>Seating Plan</h1>
+    <div class="generate-reports">
+      <div class="reports-links">
+        <a href="/download_seating_plan" class="report-link">Download Seating Plan</a>
+        <a href="/" class="report-link">Back to Home</a>
+      </div>
     </div>
-  </div>
-  <br><br><br>
-  <table border="1">
-    <tr>
-      <th>Classroom</th>
-      <th>Subject</th>
-      <th>Number of Students</th>
-      <th>Roll Number Range</th>
-    </tr>
-    {% for entry in seating_plan %}
+    <br><br><br>
+    <table border="1">
       <tr>
-        <td>{{ entry.classroom }}</td>
-        <td>{{ entry.subject }}</td>
-        <td>{{ entry.num_students }}</td>
-        <td>{{ entry.roll_range }}</td>
+        <th>Classroom</th>
+        <th>Course Name</th>
+        <th>Semester</th>
+        <th>Scheme</th>
+        <th>Number of Students</th>
+        <th>Roll Number Range</th>
       </tr>
-    {% endfor %}
-  </table>
-  <!-- <a href="/download_seating_plan">Download Seating Plan Excel</a>
-  <br>
-  <a href="/">Back to Home</a> -->
-</div>
+      {% for entry in seating_plan %}
+        <tr>
+          <td>{{ entry.classroom }}</td>
+          <td>{{ entry.subject }}</td>
+          <td>{{ entry.semester }}</td>
+          <td>{{ entry.scheme }}</td>
+          <td>{{ entry.num_students }}</td>
+          <td>{{ entry.roll_range }}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
 </body>
 </html>

@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Roll Call List</title>
+  <link rel="stylesheet" href="./../static/styles.css">
   <style>
-    
     table {
       width: 100%;
       border-collapse: collapse;
@@ -29,8 +29,6 @@
       margin-bottom: 10px;
     }
   </style>
-
-<link rel="stylesheet" href="./../static/styles.css">
 </head>
 <body>
   <header>
@@ -38,77 +36,70 @@
   </header>
   <div class="sidebar">
     <div class="sidebar-content">
-      
+      <!-- Sidebar content if needed -->
     </div>
   </div>
   <div class="container3">
-
-
-   
-
-  <h1>Roll Call List</h1>
-  <div class="generate-reports">
-    <div class="reports-links">
-      <a href="/download_roll_call_list" class="report-link">Download Roll Call List Excel</a>
-      <a href="/" class="report-link">Back to Home</a>
+    <h1>Roll Call List</h1>
+    <div class="generate-reports">
+      <div class="reports-links">
+        <a href="/download_roll_call_list" class="report-link">Download Roll Call List Excel</a>
+        <a href="/" class="report-link">Back to Home</a>
+      </div>
     </div>
-  </div>
-  <br><br><br>
-  
-  {% for classroom, data in classroom_data.items() %}
-  <div class="header">
-    <h2>Somaiya Vidyavihar University</h2>
-    <h3>K.J. Somaiya School Of Engineering</h3>
-  </div>
-  <div class="subheader">
-    <p><strong>ATTENDANCE OF CANDIDATES WHO ARE PRESENT FOR THE EXAMINATION NOV-DEC 2024</strong></p>
-    <p><strong>School Code: 16</strong></p>
-  </div>
-  <div class="subheader">
-    <p><strong>Instructions:</strong> Junior Supervisors should personally obtain the signature of the candidate, while checking the Hall-Tickets/ Fee Receipt / Identity Card.</p>
-  </div>
-  <div class="subheader">
-    <p><strong>Supervisor's No.</strong></p>
-    <p><strong>Block No.</strong> {{ classroom[0:4] }}</p>
-  </div>
-  <div class="subheader">
-    <p><strong>Programme:</strong> {{ data.programme }}</p>
-    <p><strong>Semester:</strong> {{ data.semester }}</p>
-  </div>
-  <div class="subheader">
-    <p><strong>Seat No From:</strong> {{ data.students[0]['Student Roll'] }}</p>
-    <p><strong>Seat No.Upto:</strong> {{ data.students[-1]['Student Roll'] }}</p>
-    <p><strong>Total:</strong> {{ data.students|length }}</p>
-  </div>
-  <div class="subheader">
-    <p><strong>Course (Paper) Name:</strong> {{ data.subject_name }}</p>
-    <p><strong>Time:</strong> {{ exam_time }}</p>
-  </div>
-  <div class="subheader">
-    <p><strong>Date:</strong> {{ exam_date }}</p>
-    <p><strong>Session:</strong> {{ exam_session }}</p>
-    <p><strong>Section:</strong></p>
-  </div>
-    <table border="1">
-      <tr>
-        <th>SRNO</th>
-        <th>SEAT No.</th>
-        <th>NAME</th>
-      </tr>
-      {% for student in data.students %}
+    <br><br><br>
+    {% for classroom, data in classroom_data.items() %}
+      <div class="header">
+        <h2>Somaiya Vidyavihar University</h2>
+        <h3>K.J. Somaiya School Of Engineering</h3>
+      </div>
+      <div class="subheader">
+        <p><strong>ATTENDANCE OF CANDIDATES WHO ARE PRESENT FOR THE EXAMINATION NOV-DEC 2024</strong></p>
+        <p><strong>School Code: 16</strong></p>
+      </div>
+      <div class="subheader">
+        <p><strong>Instructions:</strong> Junior Supervisors should personally obtain the signature of the candidate while checking the Hall-Tickets/ Fee Receipt / Identity Card.</p>
+      </div>
+      <div class="subheader">
+        <p><strong>Supervisor's No.</strong></p>
+        <p><strong>Block No.</strong> {{ classroom[0:4] }}</p>
+      </div>
+      <div class="subheader">
+        <p><strong>Programme:</strong> {{ data.programme }}</p>
+        <p><strong>Semester:</strong> {{ data.semester }}</p>
+      </div>
+      <div class="subheader">
+        <p><strong>Seat No From:</strong> {{ data.students[0]['Student Roll'] }}</p>
+        <p><strong>Seat No. Upto:</strong> {{ data.students[-1]['Student Roll'] }}</p>
+        <p><strong>Total:</strong> {{ data.students|length }}</p>
+      </div>
+      <div class="subheader">
+        <p>
+          <strong>Course (Paper) Name:</strong>
+          {{ data.subject_name }} – Semester: {{ data.semester }} – Scheme: {{ data.scheme }}
+        </p>
+        <p><strong>Time:</strong> {{ exam_time }}</p>
+      </div>
+      <div class="subheader">
+        <p><strong>Date:</strong> {{ exam_date }}</p>
+        <p><strong>Session:</strong> {{ exam_session }}</p>
+        <p><strong>Section:</strong></p>
+      </div>
+      <table border="1">
         <tr>
-          <td>{{ loop.index }}</td>
-          <td>{{ student['Student Roll'] }}</td>
-          <td>{{ student['Name'] }}</td>
+          <th>SRNO</th>
+          <th>SEAT No.</th>
+          <th>NAME</th>
         </tr>
-      {% endfor %}
-    </table>
-  {% endfor %}
-  <!-- <a href="/download_roll_call_list">Download Roll Call List Excel</a>
-  <br>
-  <a href="/">Back to Home</a> -->
-
-  
+        {% for student in data.students %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ student['Student Roll'] }}</td>
+            <td>{{ student['Name'] }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% endfor %}
   </div>
 </body>
 </html>
