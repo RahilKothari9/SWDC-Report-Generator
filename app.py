@@ -575,26 +575,29 @@ def select_subjects():
 def seating_plan():
     if 'file_uploaded' not in session or 'selected_subjects' not in session:
         return redirect(url_for('index'))
-    
     selected_subjects = session['selected_subjects']
-    allocation = allocate_students_to_classrooms(students_df, classrooms, selected_subjects)
-    seating_plan_data = []
-    for classroom, data in allocation.items():
-        students = data['students']
-        roll_numbers = students['Student Roll'].tolist()
-        # Look up the subject info from the subjects list using subject name.
-        subject_info = next((s for s in subjects if s['name'] == data['subject']), {})
-        seating_plan_data.append({
-            'classroom': classroom.rstrip('x'),  # Strip trailing x's for display
-            'subject': subject_info.get('name', data['subject']),
-            'semester': subject_info.get('semester', students['Semester'].iloc[0] if not students.empty else ''),
-            'scheme': subject_info.get('scheme', ''),
-            'num_students': len(students),
-            'roll_range': f"{min(roll_numbers)} - {max(roll_numbers)}"
-        })
 
-    return render_template('seating_plan.html', seating_plan=seating_plan_data)
-
+    try:
+        allocation = allocate_students_to_classrooms(students_df, classrooms, selected_subjects)
+        seating_plan_data = []
+        for classroom, data in allocation.items():
+            students = data['students']
+            roll_numbers = students['Student Roll'].tolist()
+            # Look up the subject info from the subjects list using subject name.
+            subject_info = next((s for s in subjects if s['name'] == data['subject']), {})
+            seating_plan_data.append({
+                'classroom': classroom.rstrip('x'),  # Strip trailing x's for display
+                'subject': subject_info.get('name', data['subject']),
+                'semester': subject_info.get('semester', students['Semester'].iloc[0] if not students.empty else ''),
+                'scheme': subject_info.get('scheme', ''),
+                'num_students': len(students),
+                'roll_range': f"{min(roll_numbers)} - {max(roll_numbers)}"
+            })
+        return render_template('seating_plan.html', seating_plan=seating_plan_data)
+    except Exception as e:
+            error_message = str(e)  
+            return render_template('error.html', message=error_message), 400
+    
 @app.route('/download_seating_plan')
 def download_seating_plan():
     if 'file_uploaded' not in session or 'selected_subjects' not in session:
@@ -629,35 +632,36 @@ def download_seating_plan():
 def roll_call_list():
     if 'file_uploaded' not in session or 'selected_subjects' not in session:
         return redirect(url_for('index'))
-    
     selected_subjects = session['selected_subjects']
-    allocation = allocate_students_to_classrooms(students_df, classrooms, selected_subjects)
 
-    classroom_data = {}
-    for classroom, data in allocation.items():
-        subject_info = next((subject for subject in subjects if subject['name'] == data['subject']), None)
-        if subject_info is None:
-            continue
-        # Save display_classroom as the classroom name stripped of trailing x's.
-        display_classroom = classroom.rstrip('x')
-        classroom_data[display_classroom] = {
-            'subject_name': subject_info['name'],
-            'subject_code': subject_info['course_code'],
-            'scheme': subject_info['scheme'],
-            'programme': data['students'].iloc[0]['Programme'] if not data['students'].empty else '',
-            'semester': subject_info['semester'],
-            'students': data['students'].to_dict(orient='records')
-        }
-
-    exam_date = datetime.now().strftime("%d.%m.%Y")
-    exam_time = "2.30 PM - 5.30 PM"
-    exam_session = "Afternoon"
-
-    return render_template('roll_call_list.html',
-                           classroom_data=classroom_data,
-                           exam_date=exam_date,
-                           exam_time=exam_time,
-                           exam_session=exam_session)
+    try:
+        allocation = allocate_students_to_classrooms(students_df, classrooms, selected_subjects)
+        classroom_data = {}
+        for classroom, data in allocation.items():
+            subject_info = next((subject for subject in subjects if subject['name'] == data['subject']), None)
+            if subject_info is None:
+                continue
+            # Save display_classroom as the classroom name stripped of trailing x's.
+            display_classroom = classroom.rstrip('x')
+            classroom_data[display_classroom] = {
+                'subject_name': subject_info['name'],
+                'subject_code': subject_info['course_code'],
+                'scheme': subject_info['scheme'],
+                'programme': data['students'].iloc[0]['Programme'] if not data['students'].empty else '',
+                'semester': subject_info['semester'],
+                'students': data['students'].to_dict(orient='records')
+            }
+        exam_date = datetime.now().strftime("%d.%m.%Y")
+        exam_time = "2.30 PM - 5.30 PM"
+        exam_session = "Afternoon"
+        return render_template('roll_call_list.html',
+                            classroom_data=classroom_data,
+                            exam_date=exam_date,
+                            exam_time=exam_time,
+                            exam_session=exam_session)
+    except Exception as e:
+                error_message = str(e)  
+                return render_template('error.html', message=error_message), 400
 
 @app.route('/download_roll_call_list')
 def download_roll_call_list():

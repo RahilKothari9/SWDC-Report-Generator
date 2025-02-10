@@ -316,3 +316,7 @@ header {
 .namer{
   margin-right: 3vw;
 }
+
+.error-message {
+  margin-bottom: 20px; 
+}
