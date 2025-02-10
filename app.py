@@ -528,6 +528,20 @@ def create_roll_call_excel(classroom_data):
         ws[f'A{num}'].alignment = alignment2
         ws.merge_cells(f'A{num}:D{num}')
         
+        #footer
+        ws[f"A{num+13}"] = "Checked by:"
+        ws[f"D{num+13}"] = "Name and Signature of Block Supervisor: "
+        ws[f"A{num+15}"] = "Date:"
+        ws[f"D{num+15}"] = "Signature of Sr. Supervisor: "
+        ws[f'A{num+13}'].font = font4
+        ws[f'A{num+13}'].alignment = alignment2
+        ws[f'D{num+13}'].font = font4
+        ws[f'D{num+13}'].alignment = alignment2
+        ws[f'A{num+15}'].font = font4
+        ws[f'A{num+15}'].alignment = alignment2
+        ws[f'D{num+15}'].font = font4
+        ws[f'D{num+15}'].alignment = alignment2
+       
     wb.remove(wb['Sheet'])
     return wb
 
