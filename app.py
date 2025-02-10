@@ -742,7 +742,7 @@ def toggle_classroom_status():
     status = request.json.get('status')
     if classroom in classrooms:
         classrooms[classroom]['status'] = 'enabled' if status == 'enabled' else 'disabled'
-        return jsonify({'status': 'success', 'message': f'Classroom {classroom} {status}d successfully'})
+        return jsonify({'status': 'success', 'message': f'Classroom {classroom} {status} successfully'})
     return jsonify({'status': 'error', 'message': f'Classroom {classroom} not found'})
 
 @app.route('/modify_classroom_capacity', methods=['POST'])

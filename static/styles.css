@@ -320,3 +320,11 @@ header {
 .error-message {
   margin-bottom: 20px; 
 }
+
+.config {
+  display: inline-block;
+  padding: 5px 10px;
+  background-color: #b7202e; /* Power Red */
+  color: #ffffff;
+  transition: background-color 0.2s ease;
+}
