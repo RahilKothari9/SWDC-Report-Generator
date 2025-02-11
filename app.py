@@ -32,7 +32,7 @@ classrooms = {
     'B301': {'capacity': 30, 'status': 'enabled'},
     # Add or edit classrooms as needed
 }
-
+og_classrooms = classrooms.copy()
 # Updated subjects list with full details
 subjects = [
     # Semester 4 (SUV2023)
@@ -122,8 +122,9 @@ def allocate_students_to_classrooms(students, classrooms, selected_subjects):
             elif available_classrooms:
                 break
             else:
+                # classrooms=(og_classrooms)
                 return allocation
-
+    # classrooms=(og_classrooms)
     return allocation
 
 def create_seating_plan_excel(seating_plan_data):
@@ -578,7 +579,8 @@ def seating_plan():
     selected_subjects = session['selected_subjects']
 
     try:
-        allocation = allocate_students_to_classrooms(students_df, classrooms, selected_subjects)
+        classcopy = classrooms.copy()
+        allocation = allocate_students_to_classrooms(students_df, classcopy, selected_subjects)
         seating_plan_data = []
         for classroom, data in allocation.items():
             students = data['students']
@@ -604,7 +606,8 @@ def download_seating_plan():
         return redirect(url_for('index'))
 
     selected_subjects = session['selected_subjects']
-    allocation = allocate_students_to_classrooms(students_df, classrooms, selected_subjects)
+    classcopy = classrooms.copy()
+    allocation = allocate_students_to_classrooms(students_df, classcopy, selected_subjects)
 
     seating_plan_data = []
     for classroom, data in allocation.items():
@@ -635,7 +638,8 @@ def roll_call_list():
     selected_subjects = session['selected_subjects']
 
     try:
-        allocation = allocate_students_to_classrooms(students_df, classrooms, selected_subjects)
+        classcopy = classrooms.copy()
+        allocation = allocate_students_to_classrooms(students_df, classcopy, selected_subjects)
         classroom_data = {}
         for classroom, data in allocation.items():
             subject_info = next((subject for subject in subjects if subject['name'] == data['subject']), None)
@@ -668,8 +672,9 @@ def download_roll_call_list():
     if 'file_uploaded' not in session or 'selected_subjects' not in session:
         return redirect(url_for('index'))
     
+    classcopy = classrooms.copy()
     selected_subjects = session['selected_subjects']
-    allocation = allocate_students_to_classrooms(students_df, classrooms, selected_subjects)
+    allocation = allocate_students_to_classrooms(students_df, classcopy, selected_subjects)
 
     classroom_data = {}
     for classroom, data in allocation.items():
@@ -700,9 +705,7 @@ def configure():
 
     if request.method == 'POST':
         # Check if the form submission is for updating the share option.
-        if 'allow_class_sharing' in request.form:
-            # The checkbox sends 'on' when checked; if not present, assume False.
-            app.config['ALLOW_CLASS_SHARING'] = request.form.get('allow_class_sharing') == 'on'
+        app.config['ALLOW_CLASS_SHARING'] = request.form.get('allow_class_sharing') == 'on'
         
         # Handle adding classrooms
         if 'classroom' in request.form and 'capacity' in request.form:
