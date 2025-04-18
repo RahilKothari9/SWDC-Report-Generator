@@ -70,6 +70,12 @@
         .catch(err => console.error('Error:', err));
       }
     }
+    
+    // Function to toggle custom date fields
+    function toggleCustomDateFields() {
+      const useCustomDate = document.getElementById('use_custom_date').checked;
+      document.getElementById('custom_date_fields').style.display = useCustomDate ? 'block' : 'none';
+    }
   </script>
 </head>
 <body>
@@ -85,6 +91,55 @@
   </div>
   <div class="configure">
     <h1>Configuration Page</h1>
+
+    <!-- New Section: Exam Settings -->
+    <h2>Exam Settings</h2>
+    <form method="POST" action="/configure">
+      <input type="hidden" name="exam_settings" value="true">
+      
+      <div class="form-group">
+        <label for="exam_period">Exam Period:</label>
+        <input type="text" id="exam_period" name="exam_period" value="{{ exam_period }}" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="exam_session">Exam Session:</label>
+        <input type="text" id="exam_session" name="exam_session" value="{{ exam_session }}" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="exam_start_time">Exam Start Time:</label>
+        <input type="text" id="exam_start_time" name="exam_start_time" value="{{ exam_start_time }}" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="exam_end_time">Exam End Time:</label>
+        <input type="text" id="exam_end_time" name="exam_end_time" value="{{ exam_end_time }}" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="use_custom_date">Use Custom Date:</label>
+        <input type="checkbox" id="use_custom_date" name="use_custom_date" 
+               {% if use_custom_date %} checked {% endif %} onchange="toggleCustomDateFields()">
+      </div>
+      
+      <div id="custom_date_fields" style="display: {% if use_custom_date %}block{% else %}none{% endif %};">
+        <div class="form-group">
+          <label for="custom_exam_date">Custom Exam Date (DD.MM.YYYY):</label>
+          <input type="text" id="custom_exam_date" name="custom_exam_date" 
+                 value="{{ custom_exam_date if custom_exam_date else '' }}">
+        </div>
+        
+        <div class="form-group">
+          <label for="custom_exam_day">Custom Exam Day (e.g., Monday):</label>
+          <input type="text" id="custom_exam_day" name="custom_exam_day" 
+                 value="{{ custom_exam_day if custom_exam_day else '' }}">
+        </div>
+      </div>
+      
+      <button type="submit">Save Exam Settings</button>
+    </form>
+    <hr>
 
     <!-- New Section: Toggle for Class Sharing -->
     <h2>General Options</h2>

@@ -13,6 +13,16 @@ app.config['UPLOAD_FOLDER'] = 'uploads'
 app.secret_key = '3d6f45a5fc12445dbac2f59c3b6c7cb1'
 app.config['ALLOW_CLASS_SHARING'] = False
 
+# App configuration settings for previously hardcoded values
+app.config['EXAM_PERIOD'] = "November December 2024"
+app.config['EXAM_SESSION'] = "Afternoon"
+app.config['EXAM_START_TIME'] = "02.30 am"
+app.config['EXAM_END_TIME'] = "05.30 pm"
+# Date and day will be automatically determined based on current date by default
+app.config['USE_CUSTOM_DATE'] = False
+app.config['CUSTOM_EXAM_DATE'] = None  # Format: DD.MM.YYYY
+app.config['CUSTOM_EXAM_DAY'] = None   # Example: Monday, Tuesday, etc.
+
 # Ensure the upload directory exists
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
@@ -152,8 +162,14 @@ def create_seating_plan_excel(seating_plan_data):
         alignment2 = Alignment(horizontal='left', vertical='center')
         border_style = Border(left=Side(style='thin'), right=Side(style='thin'),
                               top=Side(style='thin'), bottom=Side(style='thin'))
-        exam_date = datetime.now().strftime("%d.%m.%Y")
-        exam_day = datetime.now().strftime("%A")
+        
+        # Get date information from config or use current date
+        if app.config['USE_CUSTOM_DATE'] and app.config['CUSTOM_EXAM_DATE'] and app.config['CUSTOM_EXAM_DAY']:
+            exam_date = app.config['CUSTOM_EXAM_DATE']
+            exam_day = app.config['CUSTOM_EXAM_DAY']
+        else:
+            exam_date = datetime.now().strftime("%d.%m.%Y")
+            exam_day = datetime.now().strftime("%A")
 
         ws.column_dimensions['A'].width = 6
         ws.column_dimensions['B'].width = 13
@@ -188,14 +204,14 @@ def create_seating_plan_excel(seating_plan_data):
         ws.merge_cells('B5:K5')
         ws.row_dimensions[5].height = 20
 
-        subtitle_text = "November December 2024 Examination"
+        subtitle_text = f"{app.config['EXAM_PERIOD']} Examination"
         ws['B6'] = subtitle_text
         ws['B6'].font = font1
         ws['B6'].alignment = alignment1
         ws.merge_cells('B6:K6')
         ws.row_dimensions[6].height = 20
 
-        subtitle_text = f"Day/Date: {exam_day} / {exam_date}            Session: Afternoon             Time: 02.30 am to 05.30 pm"
+        subtitle_text = f"Day/Date: {exam_day} / {exam_date}            Session: {app.config['EXAM_SESSION']}             Time: {app.config['EXAM_START_TIME']} to {app.config['EXAM_END_TIME']}"
         ws['B9'] = subtitle_text
         ws['B9'].font = font2
         ws['B9'].alignment = alignment1
@@ -370,7 +386,12 @@ def create_roll_call_excel(classroom_data):
         alignment3 = Alignment(horizontal='left', vertical='center', wrap_text=True)
         alignment4 = Alignment(horizontal='right', vertical='center')
         alignment5 = Alignment(horizontal='center', vertical='center', wrap_text=True)
-        exam_date = datetime.now().strftime("%d.%m.%Y")
+        
+        # Get date information from config or use current date
+        if app.config['USE_CUSTOM_DATE'] and app.config['CUSTOM_EXAM_DATE']:
+            exam_date = app.config['CUSTOM_EXAM_DATE']
+        else:
+            exam_date = datetime.now().strftime("%d.%m.%Y")
 
         title_text = "Somaiya Vidyavihar University"
         ws['A1'] = title_text
@@ -384,7 +405,7 @@ def create_roll_call_excel(classroom_data):
         ws['A3'].alignment = alignment1
         ws.merge_cells('A3:H3')
 
-        text1 = "ATTENDANCE OF CANDIDATES WHO ARE PRESENT FOR THE EXAMINATION NOV-DEC 2024        School  Code: 16"
+        text1 = f"ATTENDANCE OF CANDIDATES WHO ARE PRESENT FOR THE EXAMINATION {app.config['EXAM_PERIOD']}        School  Code: 16"
         ws['A6'] = text1
         ws['A6'].font = font2
         ws['A6'].alignment = alignment1
@@ -397,7 +418,7 @@ def create_roll_call_excel(classroom_data):
         ws.merge_cells('A8:H8')
         ws.row_dimensions[8].height = 30
 
-        text1 = "Supervisor’s No."
+        text1 = "Supervisor's No."
         ws['A9'] = text1
         ws['A9'].font = font2
         ws['A9'].alignment = alignment2
@@ -458,7 +479,7 @@ def create_roll_call_excel(classroom_data):
         ws['A12'] = text1
         ws['A12'].font = font2
         ws['A12'].alignment = alignment2
-        text1 = "Time: 2.30 PM - 5.30 PM"
+        text1 = f"Time: {app.config['EXAM_START_TIME']} - {app.config['EXAM_END_TIME']}"
         ws['E12'] = text1
         ws['E12'].font = font2
         ws['E12'].alignment = alignment2
@@ -468,7 +489,7 @@ def create_roll_call_excel(classroom_data):
         ws['A13'] = text1
         ws['A13'].font = font2
         ws['A13'].alignment = alignment2
-        text1 = "Session:  Afternoon"
+        text1 = f"Session: {app.config['EXAM_SESSION']}"
         ws['D13'] = text1
         ws['D13'].font = font2
         ws['D13'].alignment = alignment2
@@ -655,14 +676,10 @@ def roll_call_list():
                 'semester': subject_info['semester'],
                 'students': data['students'].to_dict(orient='records')
             }
-        exam_date = datetime.now().strftime("%d.%m.%Y")
-        exam_time = "2.30 PM - 5.30 PM"
-        exam_session = "Afternoon"
-        return render_template('roll_call_list.html',
-                            classroom_data=classroom_data,
-                            exam_date=exam_date,
-                            exam_time=exam_time,
-                            exam_session=exam_session)
+        # Provide the now function to template for date formatting
+        return render_template('roll_call_list.html', 
+                             classroom_data=classroom_data,
+                             now=datetime.now)
     except Exception as e:
                 error_message = str(e)  
                 return render_template('error.html', message=error_message), 400
@@ -707,8 +724,24 @@ def configure():
         # Check if the form submission is for updating the share option.
         app.config['ALLOW_CLASS_SHARING'] = request.form.get('allow_class_sharing') == 'on'
         
+        # Handle the exam configuration settings
+        if 'exam_settings' in request.form:
+            app.config['EXAM_PERIOD'] = request.form.get('exam_period')
+            app.config['EXAM_SESSION'] = request.form.get('exam_session')
+            app.config['EXAM_START_TIME'] = request.form.get('exam_start_time')
+            app.config['EXAM_END_TIME'] = request.form.get('exam_end_time')
+            
+            # Handle custom date settings
+            app.config['USE_CUSTOM_DATE'] = request.form.get('use_custom_date') == 'on'
+            if app.config['USE_CUSTOM_DATE']:
+                app.config['CUSTOM_EXAM_DATE'] = request.form.get('custom_exam_date')
+                app.config['CUSTOM_EXAM_DAY'] = request.form.get('custom_exam_day')
+            else:
+                app.config['CUSTOM_EXAM_DATE'] = None
+                app.config['CUSTOM_EXAM_DAY'] = None
+        
         # Handle adding classrooms
-        if 'classroom' in request.form and 'capacity' in request.form:
+        elif 'classroom' in request.form and 'capacity' in request.form:
             classroom = request.form['classroom']
             capacity = int(request.form['capacity'])
             classrooms[classroom] = {'capacity': capacity, 'status': 'enabled'}
@@ -721,8 +754,18 @@ def configure():
             scheme = request.form.get('scheme', '')
             subjects.append({"name": name, "course_code": course_code, "semester": semester, "scheme": scheme})
             
-    # Pass the current option value to the template.
-    return render_template('configure.html', classrooms=classrooms, subjects=subjects, allow_class_sharing=app.config['ALLOW_CLASS_SHARING'])
+    # Pass the current option values to the template.
+    return render_template('configure.html', 
+                          classrooms=classrooms, 
+                          subjects=subjects, 
+                          allow_class_sharing=app.config['ALLOW_CLASS_SHARING'],
+                          exam_period=app.config['EXAM_PERIOD'],
+                          exam_session=app.config['EXAM_SESSION'],
+                          exam_start_time=app.config['EXAM_START_TIME'],
+                          exam_end_time=app.config['EXAM_END_TIME'],
+                          use_custom_date=app.config['USE_CUSTOM_DATE'],
+                          custom_exam_date=app.config['CUSTOM_EXAM_DATE'],
+                          custom_exam_day=app.config['CUSTOM_EXAM_DAY'])
 
 @app.route('/delete_classroom', methods=['POST'])
 def delete_classroom():

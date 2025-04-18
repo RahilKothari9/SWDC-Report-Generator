@@ -54,7 +54,7 @@
         <h3>K.J. Somaiya School Of Engineering</h3>
       </div>
       <div class="subheader">
-        <p><strong>ATTENDANCE OF CANDIDATES WHO ARE PRESENT FOR THE EXAMINATION NOV-DEC 2024</strong></p>
+        <p><strong>ATTENDANCE OF CANDIDATES WHO ARE PRESENT FOR THE EXAMINATION {{ config['EXAM_PERIOD'] }}</strong></p>
         <p><strong>School Code: 16</strong></p>
       </div>
       <div class="subheader">
@@ -78,11 +78,15 @@
           <strong>Course (Paper) Name:</strong>
           {{ data.subject_name }} – Semester: {{ data.semester }} – Scheme: {{ data.scheme }}
         </p>
-        <p><strong>Time:</strong> {{ exam_time }}</p>
+        <p><strong>Time:</strong> {{ config['EXAM_START_TIME'] }} to {{ config['EXAM_END_TIME'] }}</p>
       </div>
       <div class="subheader">
-        <p><strong>Date:</strong> {{ exam_date }}</p>
-        <p><strong>Session:</strong> {{ exam_session }}</p>
+        {% if config['USE_CUSTOM_DATE'] and config['CUSTOM_EXAM_DATE'] %}
+        <p><strong>Date:</strong> {{ config['CUSTOM_EXAM_DATE'] }}</p>
+        {% else %}
+        <p><strong>Date:</strong> {{ now().strftime('%d.%m.%Y') }}</p>
+        {% endif %}
+        <p><strong>Session:</strong> {{ config['EXAM_SESSION'] }}</p>
         <p><strong>Section:</strong></p>
       </div>
       <table border="1">
