@@ -16,7 +16,7 @@ app.config['ALLOW_CLASS_SHARING'] = False
 # App configuration settings for previously hardcoded values
 app.config['EXAM_PERIOD'] = "November December 2024"
 app.config['EXAM_SESSION'] = "Afternoon"
-app.config['EXAM_START_TIME'] = "02.30 am"
+app.config['EXAM_START_TIME'] = "02.30 pm"
 app.config['EXAM_END_TIME'] = "05.30 pm"
 # Date and day will be automatically determined based on current date by default
 app.config['USE_CUSTOM_DATE'] = False

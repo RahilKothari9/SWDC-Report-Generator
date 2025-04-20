@@ -76,6 +76,21 @@
       const useCustomDate = document.getElementById('use_custom_date').checked;
       document.getElementById('custom_date_fields').style.display = useCustomDate ? 'block' : 'none';
     }
+
+    // Auto compute exam day from date picker
+    document.addEventListener('DOMContentLoaded', function() {
+      const datePicker = document.getElementById('custom_exam_date');
+      const dayInput = document.getElementById('custom_exam_day');
+      if (datePicker) {
+        datePicker.addEventListener('change', function() {
+          const dateVal = this.value;
+          if (!dateVal) { dayInput.value = ''; return; }
+          const date = new Date(dateVal);
+          const dayNames = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+          dayInput.value = dayNames[date.getDay()];
+        });
+      }
+    });
   </script>
 </head>
 <body>
@@ -125,14 +140,14 @@
       
       <div id="custom_date_fields" style="display: {% if use_custom_date %}block{% else %}none{% endif %};">
         <div class="form-group">
-          <label for="custom_exam_date">Custom Exam Date (DD.MM.YYYY):</label>
-          <input type="text" id="custom_exam_date" name="custom_exam_date" 
-                 value="{{ custom_exam_date if custom_exam_date else '' }}">
+          <label for="custom_exam_date">Custom Exam Date:</label>
+          <input type="date" id="custom_exam_date" name="custom_exam_date" 
+                 value="{{ custom_exam_date_value if custom_exam_date_value else '' }}">
         </div>
         
         <div class="form-group">
-          <label for="custom_exam_day">Custom Exam Day (e.g., Monday):</label>
-          <input type="text" id="custom_exam_day" name="custom_exam_day" 
+          <label for="custom_exam_day">Custom Exam Day:</label>
+          <input type="text" id="custom_exam_day" name="custom_exam_day" readonly 
                  value="{{ custom_exam_day if custom_exam_day else '' }}">
         </div>
       </div>
