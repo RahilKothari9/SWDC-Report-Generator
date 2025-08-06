@@ -1,5 +1,5 @@
 ## SWDC Report Generator
-A Flask-based web application built to automate the generation of roll call lists and seating plans for internal SWDC exams. The system allows admins to upload student and room data, and generates organized reports ready for download.
+A Flask-based web application built to automate the generation of roll call lists and seating plans for university examinations. The system allows admins to upload student and room data, and generates organized reports ready for download.
 
 ### ✨ Features  
 - Upload student and room CSV files  
